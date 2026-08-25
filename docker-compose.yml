@@ -1,0 +1,74 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: organizador_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_secret_pass}
+      MYSQL_DATABASE: ${DB_NAME:-organizador_db}
+      MYSQL_USER: ${DB_USER:-organizador_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-organizador_pass}
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - organizador-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_secret_pass}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: organizador_api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${API_PORT:-3000}
+      DATABASE_URL: mysql://${DB_USER:-organizador_user}:${DB_PASSWORD:-organizador_pass}@mysql:3306/${DB_NAME:-organizador_db}
+      JWT_SECRET: ${JWT_SECRET:-super_secret_jwt_key_development_change_in_production}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-7d}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:4200}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-FinanOrganizador <noreply@organizadorfinan.com.br>}
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - organizador-network
+
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: organizador_app
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${APP_PORT:-4200}
+      API_URL: ${API_INTERNAL_URL:-http://api:3000}
+    ports:
+      - "${APP_PORT:-4200}:4200"
+    depends_on:
+      - api
+    networks:
+      - organizador-network
+
+networks:
+  organizador-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
