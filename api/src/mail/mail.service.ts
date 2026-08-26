@@ -12,10 +12,15 @@ export class MailService {
 
   constructor(private readonly configService: ConfigService) {
     this.frontendUrl = this.configService.get<string>('FRONTEND_URL', 'https://organizadorfinan.com.br');
-    this.defaultFrom = this.configService.get<string>(
-      'SMTP_FROM',
-      'FinanOrganizador <noreply@organizadorfinan.com.br>',
-    );
+    
+    const rawFrom = (this.configService.get<string>('SMTP_FROM') || '').trim();
+    if (rawFrom.includes('@')) {
+      this.defaultFrom = rawFrom;
+    } else if (rawFrom) {
+      this.defaultFrom = `${rawFrom} <noreply@organizadorfinan.com.br>`;
+    } else {
+      this.defaultFrom = 'FinanOrganizador <noreply@organizadorfinan.com.br>';
+    }
 
     this.resendApiKey =
       this.configService.get<string>('RESEND_API_KEY')?.trim() ||
