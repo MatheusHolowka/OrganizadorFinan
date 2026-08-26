@@ -53,10 +53,25 @@ module.exports = {
           light: '#e0e7ff',
           dark: '#3730a3',
         },
+        chassis: {
+          950: '#08090c',
+          900: '#0d1017',
+          800: '#131826',
+          700: '#1a2234',
+          600: '#253046',
+        },
+        mint: {
+          400: '#34d399',
+          500: '#00e599',
+          600: '#059669',
+          700: '#047857',
+        },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Outfit', 'Inter', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        syne: ['Syne', 'sans-serif'],
       },
       boxShadow: {
         'glass': '0 8px 32px 0 rgba(0, 0, 0, 0.08)',

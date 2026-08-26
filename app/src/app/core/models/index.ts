@@ -175,6 +175,34 @@ export interface ImportBatchPreview {
   items: ImportItem[];
 }
 
+export interface DashboardCardItem {
+  id: string;
+  name: string;
+  brand: string;
+  limit: number;
+  availableLimit: number;
+  usedLimit: number;
+  usedPercentage: number;
+  currentInvoiceAmount: number;
+  closingDay: number;
+  dueDay: number;
+  color?: string;
+}
+
+export interface CategoryExpenseItem {
+  name: string;
+  color: string;
+  amount: number;
+  percentage: number;
+}
+
+export interface CashFlowPoint {
+  monthLabel: string;
+  income: number;
+  expense: number;
+  invoice: number;
+}
+
 export interface DashboardSummary {
   period: { month: number; year: number };
   summary: {
@@ -186,8 +214,14 @@ export interface DashboardSummary {
     monthlyNet: number;
     totalOpenInvoices: number;
     totalVaultsSaved: number;
+    totalCardLimit: number;
+    totalCardUsed: number;
+    totalCardAvailable: number;
   };
   accounts: Account[];
+  cards: DashboardCardItem[];
+  categoryExpenses: CategoryExpenseItem[];
+  cashFlowHistory: CashFlowPoint[];
   vaults: Vault[];
   recentTransactions: Transaction[];
   scope?: 'personal' | 'family';

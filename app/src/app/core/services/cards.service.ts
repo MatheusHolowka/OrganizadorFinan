@@ -2,13 +2,14 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { CreditCard } from '../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CardsService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/credit-cards';
+  private get apiUrl() { return `${environment.apiUrl}/credit-cards`; }
 
   private _cards = signal<CreditCard[]>([]);
   private _loading = signal<boolean>(false);
@@ -47,5 +48,9 @@ export class CardsService {
 
   payInvoice(invoiceId: string, data: { accountId: string; amount?: number }): Observable<any> {
     return this.http.post(`${this.apiUrl}/invoices/${invoiceId}/pay`, data);
+  }
+
+  deleteTransaction(transactionId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/transactions/${transactionId}`);
   }
 }

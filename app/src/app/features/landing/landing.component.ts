@@ -4,12 +4,13 @@ import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CurrencyBrlPipe } from '../../shared/pipes/currency-brl.pipe';
 
-interface GoalPreset {
-  id: string;
-  name: string;
-  target: number;
-  icon: string;
-  defaultSaved: number;
+interface SimulatedTransaction {
+  date: string;
+  description: string;
+  amount: number;
+  category: string;
+  fitid: string;
+  isDuplicate?: boolean;
 }
 
 @Component({
@@ -19,723 +20,789 @@ interface GoalPreset {
   template: `
     <div 
       (mousemove)="onContainerMouseMove($event)"
-      class="min-h-screen bg-[#030712] text-white selection:bg-brand-500 selection:text-white relative overflow-hidden font-sans"
+      class="min-h-screen bg-black text-[#ededed] selection:bg-white selection:text-black relative overflow-hidden font-sans"
     >
-      <!-- Interactive Mouse Spotlight (Dynamic Background Glow that follows the cursor) -->
+      <!-- Vercel Subtle Mouse Spotlight -->
       <div class="mouse-spotlight"></div>
 
-      <!-- Background Tech Grids & Glow Accents -->
-      <div class="absolute inset-0 tech-grid pointer-events-none z-0"></div>
-      <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] bg-gradient-to-b from-brand-500/20 via-emerald-500/10 to-transparent blur-[140px] pointer-events-none z-0"></div>
-      <div class="absolute top-[35%] right-[-10%] w-[650px] h-[650px] bg-purple-500/10 rounded-full blur-[160px] pointer-events-none z-0"></div>
-      <div class="absolute top-[65%] left-[-10%] w-[550px] h-[550px] bg-brand-500/10 rounded-full blur-[150px] pointer-events-none z-0"></div>
-
-      <!-- Navigation Bar -->
-      <header class="sticky top-0 z-50 border-b border-white/[0.08] bg-[#030712]/80 backdrop-blur-xl">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <!-- ========================================================================= -->
+      <!-- 1. FLOATING ISLAND NAVBAR (CLERK / VERCEL STYLE)                          -->
+      <!-- ========================================================================= -->
+      <nav class="fixed top-4 sm:top-6 inset-x-0 z-50 max-w-6xl mx-auto px-4 pointer-events-auto">
+        <div class="floating-island-nav rounded-2xl sm:rounded-full px-4 sm:px-6 py-2.5 flex items-center justify-between transition-all duration-300">
+          
+          <!-- Brand Logo -->
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-brand-600 via-brand-500 to-emerald-300 flex items-center justify-center font-black text-white shadow-neon-emerald">
-              OF
+            <div class="w-8 h-8 rounded-lg bg-white text-black flex items-center justify-center font-bold text-xs shadow-[0_0_15px_rgba(255,255,255,0.4)]">
+              ▲
             </div>
-            <div class="flex flex-col">
-              <span class="font-display font-extrabold text-xl tracking-tight text-white flex items-center gap-1.5">
-                Organizador<span class="text-brand-400">Finan</span>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-sm tracking-tight text-white">Organizador<span class="text-neutral-400">Finan</span></span>
+              <span class="hidden sm:inline-block px-2 py-0.5 rounded-full bg-neutral-900 border border-neutral-800 text-[10px] font-mono text-neutral-400">
+                v2.4
               </span>
             </div>
           </div>
 
-          <nav class="hidden md:flex items-center gap-8 text-sm text-surface-300 font-medium">
-            <a href="#features" class="hover:text-white transition-colors">Recursos</a>
-            <a href="#live-demo" class="hover:text-white transition-colors">Demonstração</a>
-            <a href="#simulator" class="hover:text-white transition-colors">Simulador de Metas</a>
-            <a href="#security" class="hover:text-white transition-colors">Segurança & Privacidade</a>
-          </nav>
+          <!-- Nav Links -->
+          <div class="hidden md:flex items-center gap-6 text-xs font-medium text-neutral-400">
+            <button (click)="scrollTo('console')" class="hover:text-white transition-colors cursor-pointer">Console</button>
+            <button (click)="scrollTo('features')" class="hover:text-white transition-colors cursor-pointer">Engenharia</button>
+            <button (click)="scrollTo('waterfall')" class="hover:text-white transition-colors cursor-pointer">Faturas 24x</button>
+            <button (click)="scrollTo('matrix')" class="hover:text-white transition-colors cursor-pointer">Comparativo</button>
+            <button (click)="scrollTo('calculator')" class="hover:text-white transition-colors cursor-pointer">Simulador</button>
+          </div>
 
-          <div class="flex items-center gap-3">
+          <!-- Actions -->
+          <div class="flex items-center gap-2.5">
             <a
               routerLink="/login"
-              class="px-4 py-2 rounded-xl text-sm font-medium text-surface-300 hover:text-white hover:bg-white/5 transition-all"
+              class="px-3.5 py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white hover:bg-white/[0.05] transition-all"
             >
               Entrar
             </a>
             <a
               routerLink="/register"
-              class="px-5 py-2.5 rounded-xl btn-glow-emerald text-white text-sm font-bold shadow-neon-emerald flex items-center gap-2"
+              class="px-4 py-1.5 btn-vercel-primary text-xs font-semibold flex items-center gap-1.5"
             >
-              <span>Criar Conta</span>
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              <span>Começar</span>
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7" />
               </svg>
             </a>
           </div>
-        </div>
-      </header>
 
-      <!-- Hero Section -->
-      <section class="relative z-10 pt-20 pb-16 md:pt-28 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-        <!-- Floating Announcement Pill -->
-        <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-surface-900/90 border border-brand-500/30 glow-pill mb-8 animate-slide-up">
-          <span class="flex h-2 w-2 relative">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
-          </span>
-          <span class="text-xs font-semibold text-surface-200">
-            Nova Experiência: <strong class="text-brand-400">Blindagem de Metas & Inteligência de Faturas</strong>
-          </span>
-          <svg class="w-3.5 h-3.5 text-surface-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
+        </div>
+      </nav>
+
+      <!-- ========================================================================= -->
+      <!-- 2. HERO SECTION: EDITORIAL HEADLINE + CLEAN AMBIENCE                     -->
+      <!-- ========================================================================= -->
+      <section class="relative z-10 pt-36 sm:pt-44 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
+        
+        <!-- Refined Release Tag (No noisy ping dot) -->
+        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/60 border border-neutral-800 text-xs text-neutral-300 mb-8 hover:border-neutral-700 transition-all cursor-pointer shadow-sm">
+          <span class="text-neutral-400 font-mono text-[11px]">v2.4</span>
+          <span class="text-neutral-600">/</span>
+          <span class="font-medium text-neutral-300">Quarentena de Metas & Projeção 24x</span>
+          <span class="text-neutral-500">→</span>
         </div>
 
         <!-- Main Headline -->
-        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold font-display tracking-tight text-white max-w-5xl mx-auto leading-[1.1] animate-slide-up">
-          Controle financeiro inteligente com <span class="text-gradient-emerald">isolamento de patrimônio</span>
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-[-0.04em] text-white max-w-4xl mx-auto leading-[1.05]">
+          O sistema operacional das suas <span class="bg-gradient-to-b from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent">finanças pessoais.</span>
         </h1>
 
         <!-- Subtitle -->
-        <p class="mt-6 text-base sm:text-xl text-surface-300 max-w-3xl mx-auto font-normal leading-relaxed animate-slide-up">
-          O primeiro organizador financeiro pessoal com <strong>cofres blindados</strong> para suas metas (casa própria, reserva de emergência e viagens), cálculo inteligente de faturas de cartão e conciliação instantânea de extratos bancários.
+        <p class="mt-6 text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed font-normal">
+          Quarentena matemática de liquidez para seus objetivos, projeção inteligente de faturas futuras de cartão e conciliação instantânea de extratos OFX sem duplicatas.
         </p>
 
         <!-- CTA Buttons -->
-        <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up">
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
             routerLink="/register"
-            class="w-full sm:w-auto px-8 py-4 rounded-2xl btn-glow-emerald text-white font-bold text-base shadow-neon-emerald flex items-center justify-center gap-3 transition-transform hover:scale-105"
+            class="w-full sm:w-auto px-7 py-3.5 btn-vercel-primary text-sm font-semibold flex items-center justify-center gap-2"
           >
-            <span>Começar Gratuitamente</span>
-            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+            <span>Iniciar Gratuitamente</span>
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </a>
 
-          <a
-            href="#live-demo"
-            class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-surface-900/80 hover:bg-surface-800 text-surface-200 hover:text-white font-semibold text-base border border-surface-700/80 backdrop-blur-md transition-all flex items-center justify-center gap-2"
+          <button
+            (click)="scrollTo('console')"
+            class="w-full sm:w-auto px-6 py-3.5 btn-vercel-secondary text-sm font-medium flex items-center justify-center gap-2 cursor-pointer"
           >
-            <svg class="w-5 h-5 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>Ver Demonstração Interativa</span>
-          </a>
+            <span class="text-neutral-400 font-mono text-xs">⌘K</span>
+            <span>Explorar Console Interativo</span>
+          </button>
         </div>
 
-        <!-- Social Proof Stats (User-Centric) -->
-        <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto pt-10 border-t border-white/[0.08]">
-          <div class="p-3 rounded-2xl bg-surface-900/30 border border-white/[0.04]">
-            <div class="text-3xl font-black text-white font-display">100%</div>
-            <div class="text-xs text-surface-400 mt-1 uppercase font-semibold">Blindagem de Metas</div>
+        <!-- Social Proof Metrics Strip (Clean & Crisp) -->
+        <div class="mt-14 pt-8 border-t border-neutral-900 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto text-left">
+          <div>
+            <div class="text-2xl font-bold text-white tracking-tight font-display">100%</div>
+            <div class="text-xs text-neutral-400 mt-0.5">Isolamento de Metas</div>
           </div>
-          <div class="p-3 rounded-2xl bg-surface-900/30 border border-white/[0.04]">
-            <div class="text-3xl font-black text-brand-400 font-display">&lt; 1s</div>
-            <div class="text-xs text-surface-400 mt-1 uppercase font-semibold">Leitura de Extratos</div>
+          <div>
+            <div class="text-2xl font-bold text-white tracking-tight font-display">&lt; 180ms</div>
+            <div class="text-xs text-neutral-400 mt-0.5">Leitura de Extratos OFX</div>
           </div>
-          <div class="p-3 rounded-2xl bg-surface-900/30 border border-white/[0.04]">
-            <div class="text-3xl font-black text-purple-400 font-display">Zero</div>
-            <div class="text-xs text-surface-400 mt-1 uppercase font-semibold">Planilhas Manuais</div>
+          <div>
+            <div class="text-2xl font-bold text-white tracking-tight font-display">24 Meses</div>
+            <div class="text-xs text-neutral-400 mt-0.5">Cascata de Faturas</div>
           </div>
-          <div class="p-3 rounded-2xl bg-surface-900/30 border border-white/[0.04]">
-            <div class="text-3xl font-black text-indigo-400 font-display">Até 24x</div>
-            <div class="text-xs text-surface-400 mt-1 uppercase font-semibold">Previsão de Faturas</div>
+          <div>
+            <div class="text-2xl font-bold text-white tracking-tight font-display">Zero Venda</div>
+            <div class="text-xs text-neutral-400 mt-0.5">Privacidade Absoluta</div>
           </div>
         </div>
+
       </section>
 
-      <!-- LIVE INTERACTIVE SHOWCASE (Hero Interactive Terminal / Dashboard Preview) -->
-      <section id="live-demo" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-24">
-        <div class="rounded-3xl p-1 bg-gradient-to-b from-brand-500/30 via-surface-800/40 to-transparent shadow-2xl shadow-brand-500/10">
-          <div class="rounded-[22px] bg-surface-950/95 border border-surface-800 p-6 md:p-8 backdrop-blur-2xl">
-            <!-- Terminal Header / Tab Controls -->
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between pb-6 border-b border-surface-800/80 gap-4">
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
-                <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
-                <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
-                <span class="ml-2 text-xs font-mono text-surface-400">organizadorfinan // live-preview</span>
+      <!-- ========================================================================= -->
+      <!-- 3. LIVE INTERACTIVE TREASURY SOFTWARE CONSOLE (THE CLERK/VERCEL SHOWCASE) -->
+      <!-- ========================================================================= -->
+      <section id="console" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-28">
+        
+        <!-- Border-Beam Container -->
+        <div class="border-beam-card p-0.5 shadow-2xl">
+          <div class="vercel-panel rounded-[1.15rem] p-5 sm:p-8">
+            
+            <!-- Window Titlebar -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-neutral-800/80 gap-4">
+              <div class="flex items-center gap-3">
+                <div class="flex items-center gap-1.5">
+                  <div class="w-3 h-3 rounded-full bg-[#282828] border border-[#383838]"></div>
+                  <div class="w-3 h-3 rounded-full bg-[#282828] border border-[#383838]"></div>
+                  <div class="w-3 h-3 rounded-full bg-[#282828] border border-[#383838]"></div>
+                </div>
+                <div class="text-xs font-mono text-neutral-400 pl-2">
+                  organizadorfinan.app / <span class="text-white">treasury-core</span>
+                </div>
               </div>
 
               <!-- Interactive Tabs -->
-              <div class="flex flex-wrap items-center gap-1.5 p-1 rounded-2xl bg-surface-900 border border-surface-800 text-xs">
+              <div class="flex items-center p-1 rounded-xl bg-black/60 border border-neutral-800 text-xs font-medium">
                 <button
-                  (click)="activeTab.set('vault')"
-                  [ngClass]="activeTab() === 'vault' ? 'bg-purple-500/20 text-purple-300 border-purple-500/40 shadow-sm' : 'text-surface-400 hover:text-white'"
-                  class="px-3.5 py-1.5 rounded-xl font-bold transition-all border border-transparent flex items-center gap-1.5 cursor-pointer"
+                  (click)="activeTab.set('liquidity')"
+                  [ngClass]="activeTab() === 'liquidity' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white'"
+                  class="px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
                 >
-                  <span>🛡️</span>
-                  <span>Cofres & Metas</span>
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeTab() === 'liquidity' ? 'bg-emerald-400' : 'bg-transparent'"></span>
+                  <span>Quarentena de Liquidez</span>
                 </button>
                 <button
-                  (click)="activeTab.set('cards')"
-                  [ngClass]="activeTab() === 'cards' ? 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40 shadow-sm' : 'text-surface-400 hover:text-white'"
-                  class="px-3.5 py-1.5 rounded-xl font-bold transition-all border border-transparent flex items-center gap-1.5 cursor-pointer"
+                  (click)="activeTab.set('waterfall')"
+                  [ngClass]="activeTab() === 'waterfall' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white'"
+                  class="px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
                 >
-                  <span>💳</span>
-                  <span>Projeção de Cartões</span>
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeTab() === 'waterfall' ? 'bg-cyan-400' : 'bg-transparent'"></span>
+                  <span>Cascata de Faturas 24x</span>
                 </button>
                 <button
                   (click)="activeTab.set('ofx')"
-                  [ngClass]="activeTab() === 'ofx' ? 'bg-brand-500/20 text-brand-400 border-brand-500/40 shadow-sm' : 'text-surface-400 hover:text-white'"
-                  class="px-3.5 py-1.5 rounded-xl font-bold transition-all border border-transparent flex items-center gap-1.5 cursor-pointer"
+                  [ngClass]="activeTab() === 'ofx' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white'"
+                  class="px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
                 >
-                  <span>⚡</span>
-                  <span>Extratos & Conciliação</span>
-                </button>
-                <button
-                  (click)="activeTab.set('family')"
-                  [ngClass]="activeTab() === 'family' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40 shadow-sm' : 'text-surface-400 hover:text-white'"
-                  class="px-3.5 py-1.5 rounded-xl font-bold transition-all border border-transparent flex items-center gap-1.5 cursor-pointer"
-                >
-                  <span>👥</span>
-                  <span>Gestão Familiar</span>
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeTab() === 'ofx' ? 'bg-indigo-400' : 'bg-transparent'"></span>
+                  <span>Deduplicação OFX</span>
                 </button>
               </div>
             </div>
 
-            <!-- Tab Content 1: Vault Isolation Simulator -->
-            @if (activeTab() === 'vault') {
-              <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-fade-in">
-                <div class="lg:col-span-6 space-y-4">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-purple-500/10 text-purple-300 text-xs font-bold border border-purple-500/20">
-                    Blindagem Patrimonial
+            <!-- TAB 1: LIQUIDITY QUARANTINE SIMULATOR -->
+            @if (activeTab() === 'liquidity') {
+              <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                
+                <!-- Left Controls -->
+                <div class="lg:col-span-6 space-y-5 text-left">
+                  <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400">
+                    SISTEMA DE COFRES BLINDADOS
                   </div>
-                  <h3 class="text-2xl font-bold text-white font-display">
-                    Seu dinheiro de metas fica <span class="text-purple-400">100% blindado</span>
+
+                  <h3 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                    Seu saldo diário livre <span class="text-emerald-400">livre de autoengano</span>
                   </h3>
-                  <p class="text-sm text-surface-300 leading-relaxed">
-                    Ao guardar dinheiro para uma meta (ex: <strong>{{ selectedGoal().name }}</strong>), o sistema desconta esse valor do cálculo do seu <strong>Saldo Livre Diário</strong>. Você nunca gasta sua reserva por engano!
+
+                  <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    Quando você guarda dinheiro para metas (casa própria, reserva ou viagens), o OrganizadorFinan deduz esse valor do seu saldo disponível, calculando exatamente quanto você pode gastar por dia.
                   </p>
 
-                  <!-- Goal Presets Selector -->
-                  <div class="space-y-2">
-                    <span class="text-xs text-surface-400 font-semibold uppercase">Escolha um objetivo de exemplo:</span>
-                    <div class="grid grid-cols-2 gap-2">
-                      @for (g of goalPresets; track g.id) {
-                        <button
-                          (click)="selectGoal(g)"
-                          [ngClass]="selectedGoal().id === g.id ? 'bg-purple-500/20 border-purple-500/50 text-white font-bold' : 'bg-surface-900 border-surface-800 text-surface-300 hover:text-white'"
-                          class="p-2.5 rounded-xl border text-xs text-left transition-all flex items-center gap-2 cursor-pointer"
-                        >
-                          <span class="text-base">{{ g.icon }}</span>
-                          <div class="truncate">
-                            <div class="truncate font-semibold">{{ g.name }}</div>
-                            <div class="text-[10px] text-surface-400">{{ g.target | currencyBrl }}</div>
-                          </div>
-                        </button>
-                      }
-                    </div>
-                  </div>
-
-                  <!-- Interactive Slider -->
-                  <div class="pt-2 p-4 rounded-2xl bg-surface-900 border border-surface-800 space-y-3">
-                    <div class="flex justify-between text-xs">
-                      <span class="text-surface-400 font-semibold uppercase">Simular Guardado no Cofre:</span>
-                      <span class="text-purple-400 font-bold text-sm">{{ simulatedVaultAmount() | currencyBrl }}</span>
+                  <!-- Salary Slider -->
+                  <div class="p-4 rounded-xl bg-black/50 border border-neutral-800/80 space-y-3">
+                    <div class="flex justify-between text-xs font-mono">
+                      <span class="text-neutral-400">Renda Mensal Líquida:</span>
+                      <span class="text-white font-bold">{{ income() | currencyBrl }}</span>
                     </div>
                     <input
                       type="range"
-                      min="0"
-                      [max]="selectedGoal().target"
-                      [step]="selectedGoal().target / 20"
-                      [value]="simulatedVaultAmount()"
-                      (input)="onVaultSliderChange($event)"
-                      class="w-full h-2 bg-surface-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                      min="3000"
+                      max="35000"
+                      step="500"
+                      [value]="income()"
+                      (input)="onIncomeChange($event)"
+                      class="vercel-slider"
                     />
-                    <div class="flex justify-between text-[11px] text-surface-400">
-                      <span>R$ 0</span>
-                      <span>Alvo: {{ selectedGoal().target | currencyBrl }}</span>
+                    <div class="flex justify-between text-[10px] font-mono text-neutral-600">
+                      <span>R$ 3.000,00</span>
+                      <span>Arraste para calibrar</span>
+                      <span>R$ 35.000,00</span>
                     </div>
+                  </div>
+
+                  <!-- Shield Toggle -->
+                  <div class="flex items-center justify-between p-3.5 rounded-xl bg-black/40 border border-neutral-800">
+                    <div class="flex items-center gap-2.5">
+                      <span class="text-base">🛡️</span>
+                      <div class="text-xs">
+                        <div class="font-bold text-white">Modo Quarentena Ativa</div>
+                        <div class="text-[10px] text-neutral-400">Bloqueia fundos de reserva da conta corrente</div>
+                      </div>
+                    </div>
+
+                    <button
+                      (click)="toggleShield()"
+                      [ngClass]="shieldActive() ? 'bg-emerald-500 text-black font-bold' : 'bg-neutral-800 text-neutral-400'"
+                      class="px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer"
+                    >
+                      {{ shieldActive() ? 'ATIVADO' : 'DESATIVADO' }}
+                    </button>
                   </div>
                 </div>
 
-                <!-- Live Result Card -->
-                <div class="lg:col-span-6 space-y-4">
-                  <div class="p-6 rounded-3xl bg-surface-900/90 border border-purple-500/20 shadow-xl shadow-purple-500/5 relative overflow-hidden">
-                    <div class="flex justify-between items-center pb-4 border-b border-surface-800">
-                      <div class="flex items-center gap-2.5">
-                        <span class="text-2xl">{{ selectedGoal().icon }}</span>
-                        <div>
-                          <span class="text-[10px] uppercase font-bold text-surface-400">Cofre Ativo</span>
-                          <div class="text-base font-bold text-white">{{ selectedGoal().name }}</div>
+                <!-- Right Live Card Preview -->
+                <div class="lg:col-span-6 space-y-3">
+                  
+                  <!-- Main Result Box -->
+                  <div 
+                    class="p-6 rounded-2xl border transition-all duration-300"
+                    [ngClass]="shieldActive() ? 'bg-neutral-950 border-neutral-800 shadow-[0_0_30px_rgba(0,229,153,0.08)]' : 'bg-neutral-950 border-rose-900/40'"
+                  >
+                    <div class="flex justify-between items-start pb-4 border-b border-neutral-800/80">
+                      <div>
+                        <div class="text-[11px] font-mono text-neutral-400 uppercase">
+                          {{ shieldActive() ? 'Saldo Livre Seguro' : 'Saldo Ilusório na Conta' }}
+                        </div>
+                        <div class="text-3xl sm:text-4xl font-mono font-bold text-white mt-1">
+                          {{ safeBalance() | currencyBrl }}
                         </div>
                       </div>
-                      <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 text-xs font-bold">
-                        {{ ((simulatedVaultAmount() / selectedGoal().target) * 100).toFixed(0) }}% Concluído
-                      </span>
-                    </div>
 
-                    <div class="grid grid-cols-2 gap-4 my-4">
-                      <div class="p-3.5 rounded-2xl bg-surface-950/80 border border-surface-800">
-                        <span class="text-[10px] text-surface-400 uppercase font-bold">Saldo Bruto em Conta</span>
-                        <div class="text-lg font-black text-white">R$ 50.000,00</div>
-                      </div>
-                      <div class="p-3.5 rounded-2xl bg-surface-950/80 border border-brand-500/40 shadow-neon-emerald">
-                        <span class="text-[10px] text-brand-400 uppercase font-bold">Saldo Livre Real</span>
-                        <div class="text-lg font-black text-brand-400">
-                          {{ (50000 - simulatedVaultAmount() > 0 ? 50000 - simulatedVaultAmount() : 0) | currencyBrl }}
+                      <div class="text-right">
+                        <div class="text-[10px] font-mono text-neutral-500 uppercase">Teto Seguro/Dia:</div>
+                        <div class="text-lg font-mono font-bold" [ngClass]="shieldActive() ? 'text-emerald-400' : 'text-rose-400'">
+                          {{ (safeBalance() / 30) | currencyBrl }}<span class="text-xs text-neutral-500">/dia</span>
                         </div>
                       </div>
                     </div>
 
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-surface-950 h-3 rounded-full overflow-hidden p-0.5 border border-surface-800">
-                      <div
-                        class="h-full bg-gradient-to-r from-purple-500 to-emerald-400 rounded-full transition-all duration-300"
-                        [style.width.%]="(simulatedVaultAmount() / selectedGoal().target) * 100"
-                      ></div>
+                    <!-- Quarantined Breakdown -->
+                    <div class="grid grid-cols-2 gap-3 my-4 font-mono text-xs">
+                      <div class="p-3 rounded-xl bg-black/60 border border-neutral-800/80">
+                        <div class="text-[10px] text-neutral-500 uppercase">Cofres Blindados</div>
+                        <div class="text-sm font-bold text-amber-400 mt-0.5">
+                          {{ (shieldActive() ? vaultAllocation() : 0) | currencyBrl }}
+                        </div>
+                      </div>
+                      <div class="p-3 rounded-xl bg-black/60 border border-neutral-800/80">
+                        <div class="text-[10px] text-neutral-500 uppercase">Despesas Fixas</div>
+                        <div class="text-sm font-bold text-neutral-200 mt-0.5">
+                          {{ fixedExpenses() | currencyBrl }}
+                        </div>
+                      </div>
                     </div>
-                    <div class="flex justify-between text-[11px] text-surface-400 mt-2">
-                      <span>Guardado: {{ simulatedVaultAmount() | currencyBrl }}</span>
-                      <span>Falta: {{ (selectedGoal().target - simulatedVaultAmount() > 0 ? selectedGoal().target - simulatedVaultAmount() : 0) | currencyBrl }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            }
 
-            <!-- Tab Content 2: Smart Credit Card Projections -->
-            @if (activeTab() === 'cards') {
-              <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-fade-in">
-                <div class="lg:col-span-6 space-y-4">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-300 text-xs font-bold border border-indigo-500/20">
-                    Cálculo Inteligente de Ciclo
-                  </div>
-                  <h3 class="text-2xl font-bold text-white font-display">
-                    Projeção de parcelas em <span class="text-indigo-400">faturas futuras</span>
-                  </h3>
-                  <p class="text-sm text-surface-300 leading-relaxed">
-                    Comprou um item parcelado? O sistema projeta a melhor data de compra, data de corte e calcula o impacto exato nas suas faturas pelos próximos meses.
-                  </p>
-
-                  <div class="p-4 rounded-2xl bg-surface-900 border border-surface-800 space-y-3">
-                    <div class="flex justify-between text-xs">
-                      <span class="text-surface-400 font-semibold uppercase">Valor da Compra:</span>
-                      <span class="text-white font-bold">R$ 3.600,00</span>
-                    </div>
-                    <div class="flex items-center gap-2 flex-wrap">
-                      <span class="text-xs text-surface-400">Parcelar em:</span>
-                      @for (n of [1, 3, 6, 10, 12, 24]; track n) {
-                        <button
-                          (click)="simulatedInstallments.set(n)"
-                          [ngClass]="simulatedInstallments() === n ? 'bg-indigo-500 text-white font-bold shadow-md shadow-indigo-500/30' : 'bg-surface-800 text-surface-300 hover:text-white'"
-                          class="px-3 py-1 rounded-lg text-xs transition-colors cursor-pointer"
-                        >
-                          {{ n }}x
-                        </button>
+                    <!-- Status Banner -->
+                    <div class="pt-3 border-t border-neutral-800/80 text-[11px] flex items-center gap-2">
+                      @if (shieldActive()) {
+                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                        <span class="text-neutral-300">Reserva de emergência e entrada da casa 100% preservadas.</span>
+                      } @else {
+                        <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+                        <span class="text-rose-300">Alerta: Você parece ter mais saldo do que tem na realidade.</span>
                       }
                     </div>
                   </div>
+
                 </div>
 
-                <div class="lg:col-span-6 space-y-3">
-                  <div class="p-4 rounded-2xl bg-surface-900 border border-surface-800">
-                    <div class="flex justify-between items-center mb-3">
-                      <span class="text-[10px] text-surface-400 uppercase font-bold">Linha do Tempo de Faturas Futuras:</span>
-                      <span class="text-xs font-bold text-indigo-400">
-                        {{ simulatedInstallments() }}x de {{ (3600 / simulatedInstallments()) | currencyBrl }}
-                      </span>
+              </div>
+            }
+
+            <!-- TAB 2: WATERFALL INVOICE TIMELINE -->
+            @if (activeTab() === 'waterfall') {
+              <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-5 space-y-4 text-left">
+                  <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-cyan-500/10 border border-cyan-500/20 text-[11px] font-mono text-cyan-400">
+                    MOTOR DE PARCELAMENTO PREDITIVO
+                  </div>
+                  <h3 class="text-2xl font-bold tracking-tight text-white">
+                    Elimine a surpresa da fatura do mês que vem
+                  </h3>
+                  <p class="text-xs text-neutral-400 leading-relaxed">
+                    Comprou parcelado? O sistema mapeia o cruzamento exato entre a data de corte e o vencimento em cada cartão.
+                  </p>
+
+                  <div class="p-4 rounded-xl bg-black/50 border border-neutral-800/80 space-y-3">
+                    <div class="flex justify-between text-xs font-mono">
+                      <span class="text-neutral-400">Valor da Compra:</span>
+                      <span class="text-white font-bold">{{ simPurchaseValue() | currencyBrl }}</span>
                     </div>
-                    <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
-                      @for (i of getInstallmentList(); track i) {
-                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-surface-950 border border-surface-800/80 text-xs">
-                          <div class="flex items-center gap-2">
-                            <span class="w-2 h-2 rounded-full" [ngClass]="i === 1 ? 'bg-emerald-400' : 'bg-indigo-400'"></span>
-                            <span class="font-semibold text-surface-200">Fatura Mês {{ i }}</span>
-                            <span class="text-[10px] text-surface-500">Parcela {{ i }}/{{ simulatedInstallments() }}</span>
-                          </div>
-                          <span class="font-bold text-white">
-                            {{ (3600 / simulatedInstallments()) | currencyBrl }}
+                    <input
+                      type="range"
+                      min="600"
+                      max="12000"
+                      step="300"
+                      [value]="simPurchaseValue()"
+                      (input)="onPurchaseValueChange($event)"
+                      class="vercel-slider"
+                    />
+
+                    <div class="pt-2">
+                      <div class="text-[11px] font-mono text-neutral-400 mb-1.5">Parcelar em:</div>
+                      <div class="grid grid-cols-6 gap-1.5">
+                        @for (n of [2, 3, 6, 10, 12, 24]; track n) {
+                          <button
+                            (click)="simInstallmentCount.set(n)"
+                            [ngClass]="simInstallmentCount() === n ? 'bg-white text-black font-bold' : 'bg-neutral-900 text-neutral-400 border border-neutral-800'"
+                            class="py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer"
+                          >
+                            {{ n }}x
+                          </button>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Waterfall Deck List -->
+                <div class="lg:col-span-7 space-y-2">
+                  <div class="flex justify-between items-center text-xs font-mono text-neutral-400 pb-2 border-b border-neutral-800">
+                    <span>Cronograma de Faturas ({{ simInstallmentCount() }} Meses)</span>
+                    <span class="text-white font-bold">{{ simInstallmentCount() }}x de {{ (simPurchaseValue() / simInstallmentCount()) | currencyBrl }}</span>
+                  </div>
+
+                  <div class="space-y-2 max-h-[280px] overflow-y-auto pr-1 font-mono text-xs">
+                    @for (m of getMonthProjections(); track m.monthIndex) {
+                      <div class="p-3 rounded-xl bg-neutral-950 border border-neutral-800 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                          <span class="w-6 h-6 rounded-lg bg-neutral-900 text-neutral-300 flex items-center justify-center text-[10px] font-bold">
+                            {{ m.monthIndex }}
                           </span>
+                          <div>
+                            <div class="text-neutral-200 font-bold">{{ m.monthName }}</div>
+                            <div class="text-[10px] text-neutral-500">Parcela {{ m.monthIndex }}/{{ simInstallmentCount() }} • Fechamento Dia 25</div>
+                          </div>
                         </div>
-                      }
-                    </div>
+                        <div class="font-bold text-white">
+                          {{ (simPurchaseValue() / simInstallmentCount()) | currencyBrl }}
+                        </div>
+                      </div>
+                    }
                   </div>
                 </div>
               </div>
             }
 
-            <!-- Tab Content 3: OFX Parser Engine -->
+            <!-- TAB 3: OFX DEDUPLICATION TERMINAL -->
             @if (activeTab() === 'ofx') {
-              <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-fade-in">
-                <div class="lg:col-span-6 space-y-4">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-brand-500/10 text-brand-400 text-xs font-bold border border-brand-500/20">
-                    Importação Inteligente
+              <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-5 space-y-4 text-left">
+                  <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-indigo-500/10 border border-indigo-500/20 text-[11px] font-mono text-indigo-400">
+                    TRAVA FITID ANTI-DUPLICATAS
                   </div>
-                  <h3 class="text-2xl font-bold text-white font-display">
-                    Conciliação com <span class="text-brand-400">bloqueio de duplicatas</span>
+                  <h3 class="text-2xl font-bold tracking-tight text-white">
+                    Importe extratos bancários com precisão cirúrgica
                   </h3>
-                  <p class="text-sm text-surface-300 leading-relaxed">
-                    Importe extratos bancários (.OFX e .CSV) de qualquer banco com detecção automática de lançamentos repetidos e categorização instantânea.
+                  <p class="text-xs text-neutral-400 leading-relaxed">
+                    Baixe seu extrato .OFX ou .CSV de qualquer banco brasileiro (Nubank, Itaú, Inter, Bradesco). O motor detecta lançamentos repetidos por hash e bloqueia duplicidades.
                   </p>
 
-                  <div class="p-3.5 rounded-xl bg-surface-900 border border-surface-800 text-xs font-mono text-emerald-400/90 space-y-1">
-                    <div>&gt; Extrato bancário processado com sucesso</div>
-                    <div>&gt; 28 lançamentos importados</div>
-                    <div>&gt; 0 duplicatas confirmadas via FITID</div>
-                    <div>&gt; Categorização automática: 100%</div>
+                  <div class="p-4 rounded-xl bg-black/60 border border-neutral-800 font-mono text-xs text-neutral-400 space-y-1.5">
+                    <div>&gt; Leitura de arquivo OFX: <span class="text-emerald-400">180ms</span></div>
+                    <div>&gt; Hash FITID verificado: <span class="text-emerald-400">SHA-256</span></div>
+                    <div>&gt; Duplicatas rejeitadas: <span class="text-rose-400">1 detectada</span></div>
                   </div>
                 </div>
 
-                <div class="lg:col-span-6">
-                  <div class="p-5 rounded-2xl bg-surface-900 border border-surface-800 space-y-2 font-mono text-xs">
-                    <div class="flex items-center justify-between text-surface-400 pb-2 border-b border-surface-800 text-[10px] uppercase">
-                      <span>Data</span>
-                      <span>Lançamento</span>
-                      <span>Valor</span>
-                    </div>
-                    <div class="flex items-center justify-between text-surface-200 py-1">
-                      <span>25/08</span>
-                      <span>SUPERMERCADO CENTRAL</span>
-                      <span class="text-rose-400 font-bold">-R$ 342,00</span>
-                    </div>
-                    <div class="flex items-center justify-between text-surface-200 py-1">
-                      <span>24/08</span>
-                      <span>POSTO DE COMBUSTÍVEL</span>
-                      <span class="text-rose-400 font-bold">-R$ 210,00</span>
-                    </div>
-                    <div class="flex items-center justify-between text-surface-200 py-1">
-                      <span>20/08</span>
-                      <span>RENDIMENTO SALARIAL</span>
-                      <span class="text-emerald-400 font-bold">+R$ 6.500,00</span>
-                    </div>
+                <!-- Terminal Table -->
+                <div class="lg:col-span-7 p-4 rounded-xl bg-black border border-neutral-800 font-mono text-xs space-y-2">
+                  <div class="flex justify-between text-neutral-500 text-[10px] pb-2 border-b border-neutral-800 uppercase">
+                    <span>Transação</span>
+                    <span>FITID</span>
+                    <span>Valor</span>
                   </div>
+
+                  @for (t of sampleTransactions; track t.fitid) {
+                    <div 
+                      class="p-2.5 rounded-lg border flex items-center justify-between"
+                      [ngClass]="t.isDuplicate ? 'bg-rose-950/20 border-rose-900/40 text-rose-300' : 'bg-neutral-950 border-neutral-900 text-neutral-200'"
+                    >
+                      <div>
+                        <div class="font-bold flex items-center gap-2">
+                          <span>{{ t.description }}</span>
+                          @if (t.isDuplicate) {
+                            <span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[9px] border border-rose-500/40 font-bold">
+                              DUPLICATA BLOQUEADA
+                            </span>
+                          }
+                        </div>
+                        <div class="text-[10px] text-neutral-500">{{ t.date }} • {{ t.category }}</div>
+                      </div>
+
+                      <div class="text-right">
+                        <div class="font-bold" [ngClass]="t.amount > 0 ? 'text-emerald-400' : (t.isDuplicate ? 'text-rose-400 line-through' : 'text-white')">
+                          {{ (t.amount > 0 ? '+' : '') }}{{ t.amount | currencyBrl }}
+                        </div>
+                      </div>
+                    </div>
+                  }
                 </div>
               </div>
             }
 
-            <!-- Tab Content 4: Family Budget Mode -->
-            @if (activeTab() === 'family') {
-              <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center animate-fade-in">
-                <div class="lg:col-span-6 space-y-4">
-                  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 text-xs font-bold border border-emerald-500/20">
-                    Modo Família Compartilhado
-                  </div>
-                  <h3 class="text-2xl font-bold text-white font-display">
-                    Organize as contas da casa em <span class="text-emerald-400">conjunto</span>
-                  </h3>
-                  <p class="text-sm text-surface-300 leading-relaxed">
-                    Convide membros da sua família, defina orçamentos compartilhados para o lar e mantenha a privacidade das contas pessoais quando necessário.
-                  </p>
-
-                  <div class="flex items-center gap-3">
-                    <button
-                      (click)="familyMode.set('family')"
-                      [ngClass]="familyMode() === 'family' ? 'bg-emerald-500/20 border-emerald-500/50 text-white font-bold' : 'bg-surface-900 border-surface-800 text-surface-400'"
-                      class="px-4 py-2 rounded-xl border text-xs cursor-pointer transition-all"
-                    >
-                      🏠 Visão Familiar (Consolidada)
-                    </button>
-                    <button
-                      (click)="familyMode.set('personal')"
-                      [ngClass]="familyMode() === 'personal' ? 'bg-emerald-500/20 border-emerald-500/50 text-white font-bold' : 'bg-surface-900 border-surface-800 text-surface-400'"
-                      class="px-4 py-2 rounded-xl border text-xs cursor-pointer transition-all"
-                    >
-                      👤 Visão Individual
-                    </button>
-                  </div>
-                </div>
-
-                <div class="lg:col-span-6 space-y-3">
-                  <div class="p-5 rounded-2xl bg-surface-900 border border-surface-800 space-y-3">
-                    <div class="flex justify-between items-center pb-2 border-b border-surface-800">
-                      <span class="text-xs font-bold text-white">
-                        {{ familyMode() === 'family' ? 'Orçamento Consolidado da Casa' : 'Minhas Contas Individuais' }}
-                      </span>
-                      <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px] font-bold">
-                        {{ familyMode() === 'family' ? '3 Membros Ativos' : 'Acesso Privado' }}
-                      </span>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                      <div class="p-3 rounded-xl bg-surface-950 border border-surface-800">
-                        <span class="text-[10px] text-surface-400 uppercase font-bold">Entradas Totais</span>
-                        <div class="text-base font-bold text-emerald-400">
-                          {{ familyMode() === 'family' ? 'R$ 14.800,00' : 'R$ 7.200,00' }}
-                        </div>
-                      </div>
-                      <div class="p-3 rounded-xl bg-surface-950 border border-surface-800">
-                        <span class="text-[10px] text-surface-400 uppercase font-bold">Despesas da Casa</span>
-                        <div class="text-base font-bold text-rose-400">
-                          {{ familyMode() === 'family' ? 'R$ 6.950,00' : 'R$ 3.100,00' }}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            }
           </div>
         </div>
+
       </section>
 
-      <!-- BENTO GRID FEATURES -->
-      <section id="features" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/[0.08]">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-          <h2 class="text-xs font-bold uppercase tracking-widest text-brand-400 mb-2">Simplicidade & Controle Absoluto</h2>
-          <h3 class="text-3xl sm:text-4xl font-extrabold text-white font-display">Tudo o que você precisa para dominar suas finanças</h3>
+      <!-- ========================================================================= -->
+      <!-- 4. BENTO GRID OF CORE ENGINEERING CAPABILITIES                           -->
+      <!-- ========================================================================= -->
+      <section id="features" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-neutral-900 text-left">
+        
+        <div class="max-w-2xl mb-14">
+          <span class="text-xs font-mono uppercase tracking-widest text-neutral-500 font-bold">ARQUITETURA DE DADOS</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mt-2">
+            Construído para quem exige controle absoluto
+          </h2>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <!-- Bento 1: Cofres -->
-          <div class="md:col-span-2 glass-card-pro p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+          
+          <!-- Bento 1 -->
+          <div class="md:col-span-2 p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
             <div>
-              <div class="w-12 h-12 rounded-2xl bg-purple-500/20 text-purple-300 flex items-center justify-center mb-6 shadow-sm">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                </svg>
+              <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
+                🔒
               </div>
-              <h4 class="text-xl font-bold text-white font-display">Sistema de Cofres & Metas Blindadas</h4>
-              <p class="text-sm text-surface-300 mt-2 leading-relaxed">
-                Isole fundos para objetivos importantes (casa própria, reserva de emergência, viagens ou carro novo). O dinheiro guardado nos cofres não entra no cálculo de saldo livre, impedindo gastos por impulso.
+              <h3 class="text-xl font-bold text-white tracking-tight">Cofres com Quarentena Automática</h3>
+              <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
+                Dinheiro de metas não é dinheiro livre. Crie cofres para a entrada da casa própria, reserva de emergência e viagens com aportes recorrentes e blindagem contra impulsos de consumo.
               </p>
             </div>
-            <div class="mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center gap-3 text-xs text-purple-300 font-semibold">
+            <div class="mt-6 pt-4 border-t border-neutral-900 flex items-center gap-4 text-xs font-mono text-emerald-400">
               <span>✓ Proteção contra compras impulsivas</span>
-              <span>✓ Histórico de aportes e resgates</span>
+              <span>✓ Histórico de aportes e rendimento</span>
             </div>
           </div>
 
-          <!-- Bento 2: Cartões -->
-          <div class="glass-card-pro p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+          <!-- Bento 2 -->
+          <div class="p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
             <div>
-              <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 text-indigo-400 flex items-center justify-center mb-6">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                </svg>
+              <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
+                ⚡
               </div>
-              <h4 class="text-xl font-bold text-white font-display">Inteligência de Cartões</h4>
-              <p class="text-sm text-surface-300 mt-2 leading-relaxed">
-                Cálculo automático do melhor dia de compra, fechamento e vencimento de faturas, com projeção em cascata de parcelas futuras.
+              <h3 class="text-xl font-bold text-white tracking-tight">Conciliação OFX/CSV</h3>
+              <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
+                Importe faturas e extratos em segundos. O algoritmo deduplica cobranças repetidas e categoriza lançamentos automaticamente.
               </p>
             </div>
-            <div class="mt-6 pt-4 border-t border-white/10 text-xs text-indigo-400 font-semibold">
-              ✓ Suporte a compras parceladas em até 24x
+            <div class="mt-6 pt-4 border-t border-neutral-900 text-xs font-mono text-neutral-500">
+              Compatível com todos os bancos brasileiros
             </div>
           </div>
 
-          <!-- Bento 3: Motor OFX/CSV -->
-          <div class="glass-card-pro p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+          <!-- Bento 3 -->
+          <div class="p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
             <div>
-              <div class="w-12 h-12 rounded-2xl bg-brand-500/20 text-brand-400 flex items-center justify-center mb-6 shadow-neon-emerald">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
+              <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
+                💳
               </div>
-              <h4 class="text-xl font-bold text-white font-display">Importação Ultrarrápida</h4>
-              <p class="text-sm text-surface-300 mt-2 leading-relaxed">
-                Importe seus extratos em segundos com detecção inteligente de duplicidades por checksum SHA-256 e categorização automática.
+              <h3 class="text-xl font-bold text-white tracking-tight">Projeção em Cascata</h3>
+              <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
+                Visualização antecipada de faturas futuras parceladas em até 24x com data de corte de ciclo calculada automaticamente.
               </p>
             </div>
-            <div class="mt-6 pt-4 border-t border-white/10 text-xs text-brand-400 font-semibold">
-              ✓ Compatível com todos os bancos brasileiros
+            <div class="mt-6 pt-4 border-t border-neutral-900 text-xs font-mono text-neutral-500">
+              Zero dívidas surpresa no cartão
             </div>
           </div>
 
-          <!-- Bento 4: Gestão Familiar -->
-          <div class="md:col-span-2 glass-card-pro p-8 rounded-3xl relative overflow-hidden flex flex-col justify-between">
+          <!-- Bento 4 -->
+          <div class="md:col-span-2 p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
             <div>
-              <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mb-6">
-                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+              <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
+                👥
               </div>
-              <h4 class="text-xl font-bold text-white font-display">Planejamento Familiar & Contas Conjuntas</h4>
-              <p class="text-sm text-surface-300 mt-2 leading-relaxed">
-                Compartilhe o planejamento financeiro com seu parceiro(a) ou família. Visualize gastos consolidados da casa mantendo a clareza e autonomia individual.
+              <h3 class="text-xl font-bold text-white tracking-tight">Planejamento Familiar & Contas Compartilhadas</h3>
+              <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
+                Organize despesas da casa em conjunto com seu parceiro(a) mantendo a total privacidade e autonomia sobre suas contas individuais.
               </p>
             </div>
-            <div class="mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center gap-3 text-xs text-emerald-400 font-semibold">
-              <span>✓ Múltiplos membros na mesma conta</span>
-              <span>✓ Relatórios consolidados mensais</span>
+            <div class="mt-6 pt-4 border-t border-neutral-900 flex items-center gap-4 text-xs font-mono text-neutral-400">
+              <span>✓ Visão consolidada da residência</span>
+              <span>✓ Acesso individual privado</span>
             </div>
           </div>
+
         </div>
       </section>
 
-      <!-- SIMULADOR DE METAS (FINANCIAL GOAL CALCULATOR) -->
-      <section id="simulator" class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-white/[0.08]">
-        <div class="p-8 sm:p-12 rounded-3xl bg-surface-900/80 border border-surface-700/80 backdrop-blur-2xl shadow-glass-dark">
-          <div class="text-center max-w-2xl mx-auto mb-10">
-            <span class="text-xs font-bold uppercase tracking-widest text-brand-400">Simulador de Metas & Sonhos</span>
-            <h3 class="text-3xl font-bold text-white font-display mt-1">Em quanto tempo você conquista sua meta?</h3>
-            <p class="text-xs sm:text-sm text-surface-400 mt-2">
-              Descubra em quantos meses você alcança a entrada da casa própria ou sua reserva financeira guardando um valor mensal no cofre.
-            </p>
+      <!-- ========================================================================= -->
+      <!-- 5. REALITY COMPARISON MATRIX (CLERK / VERCEL STYLE)                      -->
+      <!-- ========================================================================= -->
+      <section id="matrix" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-neutral-900 text-left">
+        
+        <div class="max-w-2xl mb-12">
+          <span class="text-xs font-mono uppercase tracking-widest text-neutral-500 font-bold">MATRIZ COMPARATIVA</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mt-2">
+            Por que planilhas e apps de banco não funcionam
+          </h2>
+        </div>
+
+        <div class="rounded-2xl border border-neutral-800 overflow-hidden bg-neutral-950">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs font-mono">
+              <thead>
+                <tr class="bg-black border-b border-neutral-800 text-neutral-500 uppercase text-[10px]">
+                  <th class="p-4 sm:p-5">Critério</th>
+                  <th class="p-4 sm:p-5 text-neutral-500">Planilhas Excel/Sheets</th>
+                  <th class="p-4 sm:p-5 text-neutral-500">App do Banco Convencional</th>
+                  <th class="p-4 sm:p-5 text-white font-bold bg-neutral-900/60">OrganizadorFinan</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-neutral-800/80 text-neutral-300">
+                <tr>
+                  <td class="p-4 sm:p-5 font-bold text-white">Quarentena de Metas (Cofres Blindados)</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Quebra facilmente</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Mistura com saldo corrente</td>
+                  <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ Quarentena matemática 100%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 sm:p-5 font-bold text-white">Cascata de Faturas Parceladas</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Complexidade extrema</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Mostra só fatura atual</td>
+                  <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ Projeção até 24 meses</td>
+                </tr>
+                <tr>
+                  <td class="p-4 sm:p-5 font-bold text-white">Deduplicação OFX sem Erros</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Digitação manual</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Preso ao banco dele</td>
+                  <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ Hash FITID instantâneo</td>
+                </tr>
+                <tr>
+                  <td class="p-4 sm:p-5 font-bold text-white">Privacidade & Soberania</td>
+                  <td class="p-4 sm:p-5 text-neutral-400">✓ Privado</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Vende crédito e limite</td>
+                  <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ Criptografado & Zero Venda</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- 6. GOALS & COMPOUND RUNWAY CALCULATOR                                    -->
+      <!-- ========================================================================= -->
+      <section id="calculator" class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-neutral-900 text-center">
+        <div class="p-8 sm:p-12 rounded-3xl bg-neutral-950 border border-neutral-800/80 shadow-2xl">
+          
+          <span class="text-xs font-mono uppercase tracking-widest text-neutral-500 font-bold">SIMULADOR DE CONQUISTAS</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mt-2">
+            Em quantos meses você atinge sua meta?
+          </h2>
+          <p class="text-xs sm:text-sm text-neutral-400 mt-2 max-w-xl mx-auto">
+            Com aportes blindados e isolados do seu saldo livre diário, você alcança seus sonhos sem desvios.
+          </p>
+
+          <!-- Quick Presets -->
+          <div class="flex flex-wrap items-center justify-center gap-2 my-8">
+            @for (g of goalPresets; track g.id) {
+              <button
+                (click)="applyGoalPreset(g)"
+                [ngClass]="activeGoalPreset().id === g.id ? 'bg-white text-black font-bold' : 'bg-neutral-900 text-neutral-400 border border-neutral-800 hover:text-white'"
+                class="px-4 py-2 rounded-xl text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <span>{{ g.icon }}</span>
+                <span>{{ g.name }}</span>
+              </button>
+            }
           </div>
 
-          <!-- Quick presets buttons -->
-          <div class="flex flex-wrap items-center justify-center gap-2 mb-8">
-            <button
-              (click)="setCalculatorGoal('Reserva de Emergência', 30000, 1500)"
-              class="px-3.5 py-1.5 rounded-full bg-surface-800 hover:bg-surface-700 text-xs text-surface-200 border border-surface-700 transition-colors cursor-pointer"
-            >
-              🛡️ Reserva (R$ 30.000)
-            </button>
-            <button
-              (click)="setCalculatorGoal('Viagem dos Sonhos', 18000, 1000)"
-              class="px-3.5 py-1.5 rounded-full bg-surface-800 hover:bg-surface-700 text-xs text-surface-200 border border-surface-700 transition-colors cursor-pointer"
-            >
-              ✈️ Viagem (R$ 18.000)
-            </button>
-            <button
-              (click)="setCalculatorGoal('Carro Novo', 65000, 2500)"
-              class="px-3.5 py-1.5 rounded-full bg-surface-800 hover:bg-surface-700 text-xs text-surface-200 border border-surface-700 transition-colors cursor-pointer"
-            >
-              🚗 Carro (R$ 65.000)
-            </button>
-            <button
-              (click)="setCalculatorGoal('Casa Própria', 120000, 3000)"
-              class="px-3.5 py-1.5 rounded-full bg-surface-800 hover:bg-surface-700 text-xs text-surface-200 border border-surface-700 transition-colors cursor-pointer"
-            >
-              🏠 Casa Própria (R$ 120.000)
-            </button>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center text-left font-mono">
             <div class="space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-surface-300 uppercase mb-1">Valor Alvo da Meta (R$)</label>
+                <label class="block text-xs font-bold text-neutral-400 uppercase mb-1.5">Alvo da Meta (R$)</label>
                 <input
                   type="number"
-                  [(ngModel)]="simTarget"
-                  class="w-full px-4 py-3 rounded-2xl bg-surface-950 border border-surface-700 text-white font-bold text-base focus:outline-none focus:border-brand-500"
+                  [(ngModel)]="simGoalTarget"
+                  class="w-full px-4 py-3 rounded-xl bg-black border border-neutral-800 text-white font-bold text-base focus:outline-none focus:border-neutral-600"
                 />
               </div>
 
               <div>
-                <label class="block text-xs font-semibold text-surface-300 uppercase mb-1">Aporte Mensal Reservado (R$)</label>
+                <label class="block text-xs font-bold text-neutral-400 uppercase mb-1.5">Aporte Mensal Reservado (R$)</label>
                 <input
                   type="number"
-                  [(ngModel)]="simMonthly"
-                  class="w-full px-4 py-3 rounded-2xl bg-surface-950 border border-surface-700 text-white font-bold text-base focus:outline-none focus:border-brand-500"
+                  [(ngModel)]="simGoalMonthly"
+                  class="w-full px-4 py-3 rounded-xl bg-black border border-neutral-800 text-white font-bold text-base focus:outline-none focus:border-neutral-600"
                 />
               </div>
             </div>
 
-            <div class="p-6 rounded-2xl bg-surface-950 border border-surface-800 text-center space-y-3">
-              <span class="text-xs uppercase font-bold text-surface-400">Tempo Estimado para Conquista</span>
-              <div class="text-4xl sm:text-5xl font-black text-brand-400 font-display">
-                {{ calculatedMonths() }} <span class="text-lg font-bold text-surface-300">meses</span>
+            <div class="p-6 rounded-2xl bg-black border border-neutral-800 text-center space-y-2">
+              <span class="text-[11px] uppercase font-bold text-neutral-500">Tempo de Conquista com Quarentena:</span>
+              <div class="text-4xl sm:text-5xl font-black text-white tracking-tight">
+                {{ calculatedMonthsToGoal() }} <span class="text-base font-bold text-neutral-500">meses</span>
               </div>
-              <p class="text-xs text-surface-400 leading-relaxed">
-                Guardando <strong>{{ simMonthly | currencyBrl }}/mês</strong> de forma blindada, você atinge os <strong>{{ simTarget | currencyBrl }}</strong> em aproximadamente <strong>{{ (calculatedMonths() / 12).toFixed(1) }} anos</strong> sem comprometer seus gastos essenciais.
+              <p class="text-xs text-neutral-400 font-sans leading-relaxed pt-1">
+                Guardando <strong>{{ simGoalMonthly | currencyBrl }}/mês</strong> de forma blindada, você atinge os <strong>{{ simGoalTarget | currencyBrl }}</strong> em aproximadamente <strong>{{ (calculatedMonthsToGoal() / 12).toFixed(1) }} anos</strong>.
               </p>
               <a
                 routerLink="/register"
-                class="inline-block mt-2 px-6 py-2.5 rounded-xl btn-glow-emerald text-white text-xs font-bold shadow-neon-emerald"
+                class="inline-block mt-3 px-6 py-2.5 btn-vercel-primary text-xs font-bold"
               >
-                Criar Este Cofre Agora
+                Abrir Este Cofre Agora
               </a>
             </div>
           </div>
+
         </div>
       </section>
 
-      <!-- SECURITY & PRIVACY SECTION -->
-      <section id="security" class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-white/[0.08]">
-        <div class="text-center max-w-3xl mx-auto mb-12">
-          <h2 class="text-xs font-bold uppercase tracking-widest text-brand-400 mb-2">Privacidade & Segurança</h2>
-          <h3 class="text-3xl font-extrabold text-white font-display">Seus dados financeiros sob sua guarda</h3>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div class="p-6 rounded-2xl bg-surface-900/50 border border-surface-800">
-            <div class="text-2xl mb-3">🔒</div>
-            <h4 class="text-base font-bold text-white mb-1">Criptografia de Ponta</h4>
-            <p class="text-xs text-surface-400 leading-relaxed">
-              Senhas criptografadas com bcrypt e sessões seguras com tokens JWT e cabeçalhos HTTPS estritos.
-            </p>
-          </div>
-          <div class="p-6 rounded-2xl bg-surface-900/50 border border-surface-800">
-            <div class="text-2xl mb-3">🛡️</div>
-            <h4 class="text-base font-bold text-white mb-1">Privacidade Absoluta</h4>
-            <p class="text-xs text-surface-400 leading-relaxed">
-              Seus dados nunca são comercializados para terceiros. O controle do seu extrato e saldo pertence apenas a você.
-            </p>
-          </div>
-          <div class="p-6 rounded-2xl bg-surface-900/50 border border-surface-800">
-            <div class="text-2xl mb-3">⚡</div>
-            <h4 class="text-base font-bold text-white mb-1">Sincronização em Tempo Real</h4>
-            <p class="text-xs text-surface-400 leading-relaxed">
-              Acesse pelo computador ou celular com interface responsiva e cálculo reativo imediato.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- FINAL CTA -->
-      <section class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-        <div class="p-10 sm:p-16 rounded-3xl bg-gradient-to-tr from-brand-600/20 via-surface-900 to-purple-600/20 border border-brand-500/30 backdrop-blur-2xl shadow-glass-dark">
-          <h2 class="text-3xl sm:text-5xl font-black text-white font-display">Pronto para transformar sua vida financeira?</h2>
-          <p class="mt-4 text-surface-300 text-sm sm:text-base max-w-2xl mx-auto">
-            Abandone as planilhas complexas e controle seu dinheiro com a clareza e previsibilidade que você sempre quis.
+      <!-- ========================================================================= -->
+      <!-- 7. HIGH-CONVERSION CTA FOOTER (VERCEL STYLE)                              -->
+      <!-- ========================================================================= -->
+      <section class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center border-t border-neutral-900">
+        <div class="max-w-2xl mx-auto space-y-6">
+          <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+            Assuma o controle total do seu dinheiro hoje.
+          </h2>
+          <p class="text-sm text-neutral-400">
+            Comece em menos de 1 minuto. Sem cartão de crédito obrigatório.
           </p>
 
-          <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               routerLink="/register"
-              class="w-full sm:w-auto px-8 py-4 rounded-2xl btn-glow-emerald text-white font-bold text-base shadow-neon-emerald"
+              class="w-full sm:w-auto px-8 py-4 btn-vercel-primary text-sm font-bold shadow-2xl"
             >
-              Criar Minha Conta Gratuita
+              Criar Conta Gratuita
             </a>
             <a
               routerLink="/login"
-              class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-surface-900 hover:bg-surface-800 text-surface-200 font-semibold text-base border border-surface-700"
+              class="w-full sm:w-auto px-8 py-4 btn-vercel-secondary text-sm font-medium"
             >
-              Acessar Sistema
+              Acessar Minha Conta
             </a>
           </div>
         </div>
       </section>
 
-      <!-- FOOTER -->
-      <footer class="relative z-10 border-t border-white/[0.08] bg-surface-950 py-10 px-4 sm:px-6 lg:px-8 text-center text-xs text-surface-500">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-lg bg-brand-500 text-white font-black flex items-center justify-center text-[10px]">OF</div>
-            <span class="text-surface-300 font-bold">OrganizadorFinan</span>
+      <!-- Minimal Footer -->
+      <footer class="relative z-10 border-t border-neutral-900 bg-black py-10 px-4 text-xs font-mono text-neutral-500">
+        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2 text-neutral-400">
+            <span>▲</span>
+            <span class="font-bold text-white">OrganizadorFinan</span>
+            <span>—</span>
+            <span>Finanças com Engenharia & Soberania</span>
           </div>
+
           <div>© 2026 OrganizadorFinan. Todos os direitos reservados.</div>
-          <div class="flex items-center gap-4 text-surface-400">
+
+          <div class="flex items-center gap-4 text-neutral-400">
             <a routerLink="/login" class="hover:text-white transition-colors">Entrar</a>
             <a routerLink="/register" class="hover:text-white transition-colors">Cadastro</a>
           </div>
         </div>
       </footer>
+
     </div>
   `,
 })
 export class LandingComponent {
-  activeTab = signal<'vault' | 'cards' | 'ofx' | 'family'>('vault');
-  familyMode = signal<'family' | 'personal'>('family');
+  // Tabs Signal
+  activeTab = signal<'liquidity' | 'waterfall' | 'ofx'>('liquidity');
 
-  goalPresets: GoalPreset[] = [
-    { id: 'reserva', name: 'Reserva de Emergência', target: 35000, icon: '🛡️', defaultSaved: 20000 },
-    { id: 'casa', name: 'Entrada da Casa Própria', target: 120000, icon: '🏠', defaultSaved: 45000 },
-    { id: 'viagem', name: 'Viagem em Família', target: 15000, icon: '✈️', defaultSaved: 10500 },
-    { id: 'carro', name: 'Carro Novo', target: 60000, icon: '🚗', defaultSaved: 28000 },
-  ];
+  // Hero Interactive Treasury Signals
+  income = signal<number>(8500);
+  shieldActive = signal<boolean>(true);
 
-  selectedGoal = signal<GoalPreset>(this.goalPresets[0]);
-  simulatedVaultAmount = signal<number>(20000);
-  simulatedInstallments = signal<number>(6);
-
-  simTarget: number = 35000;
-  simMonthly: number = 1500;
-
-  calculatedMonths = computed(() => {
-    if (this.simMonthly <= 0) return 0;
-    return Math.ceil(this.simTarget / this.simMonthly);
+  // Computations for real-time treasury
+  vaultAllocation = computed(() => {
+    return Math.round(this.income() * 0.38);
   });
 
-  selectGoal(goal: GoalPreset) {
-    this.selectedGoal.set(goal);
-    this.simulatedVaultAmount.set(goal.defaultSaved);
+  fixedExpenses = computed(() => {
+    return Math.round(this.income() * 0.42);
+  });
+
+  safeBalance = computed(() => {
+    if (this.shieldActive()) {
+      return this.income() - this.vaultAllocation() - this.fixedExpenses();
+    } else {
+      return this.income() - this.fixedExpenses();
+    }
+  });
+
+  // Credit Card Waterfall Simulator Signals
+  simPurchaseValue = signal<number>(3600);
+  simInstallmentCount = signal<number>(6);
+
+  // OFX Dedup Lab Sample Data
+  sampleTransactions: SimulatedTransaction[] = [
+    { date: '25/08', description: 'SUPERMERCADO CENTRAL', amount: -342.50, category: 'Alimentação', fitid: '20260825001' },
+    { date: '25/08', description: 'SUPERMERCADO CENTRAL', amount: -342.50, category: 'Alimentação', fitid: '20260825001', isDuplicate: true },
+    { date: '24/08', description: 'POSTO DE COMBUSTÍVEL IPIRANGA', amount: -210.00, category: 'Transporte', fitid: '20260824009' },
+    { date: '22/08', description: 'FARMÁCIA SÃO PAULO', amount: -89.90, category: 'Saúde', fitid: '20260822014' },
+    { date: '20/08', description: 'RENDIMENTO SALARIAL // TED', amount: 8500.00, category: 'Renda', fitid: '20260820088' },
+  ];
+
+  // Asset Goal Calculator Signals
+  goalPresets = [
+    { id: 'reserva', name: 'Reserva de Emergência', target: 30000, monthly: 1500, icon: '🛡️' },
+    { id: 'casa', name: 'Entrada da Casa Própria', target: 120000, monthly: 2500, icon: '🏠' },
+    { id: 'viagem', name: 'Viagem dos Sonhos', target: 18000, monthly: 1000, icon: '✈️' },
+    { id: 'carro', name: 'Carro Novo', target: 60000, monthly: 2000, icon: '🚗' },
+  ];
+
+  activeGoalPreset = signal(this.goalPresets[0]);
+  simGoalTarget = 30000;
+  simGoalMonthly = 1500;
+
+  calculatedMonthsToGoal = computed(() => {
+    if (this.simGoalMonthly <= 0) return 0;
+    return Math.ceil(this.simGoalTarget / this.simGoalMonthly);
+  });
+
+  // Event Handlers
+  onIncomeChange(e: Event) {
+    const val = Number((e.target as HTMLInputElement).value);
+    this.income.set(val);
   }
 
-  setCalculatorGoal(name: string, target: number, monthly: number) {
-    this.simTarget = target;
-    this.simMonthly = monthly;
+  toggleShield() {
+    this.shieldActive.update((prev) => !prev);
+  }
+
+  onPurchaseValueChange(e: Event) {
+    const val = Number((e.target as HTMLInputElement).value);
+    this.simPurchaseValue.set(val);
+  }
+
+  applyGoalPreset(g: typeof this.goalPresets[0]) {
+    this.activeGoalPreset.set(g);
+    this.simGoalTarget = g.target;
+    this.simGoalMonthly = g.monthly;
+  }
+
+  getMonthProjections() {
+    const months = [
+      'Setembro 2026', 'Outubro 2026', 'Novembro 2026', 'Dezembro 2026',
+      'Janeiro 2027', 'Fevereiro 2027', 'Março 2027', 'Abril 2027',
+      'Maio 2027', 'Junho 2027', 'Julho 2027', 'Agosto 2027',
+      'Setembro 2027', 'Outubro 2027', 'Novembro 2027', 'Dezembro 2027',
+      'Janeiro 2028', 'Fevereiro 2028', 'Março 2028', 'Abril 2028',
+      'Maio 2028', 'Junho 2028', 'Julho 2028', 'Agosto 2028'
+    ];
+    
+    return Array.from({ length: this.simInstallmentCount() }, (_, i) => ({
+      monthIndex: i + 1,
+      monthName: months[i % months.length],
+    }));
+  }
+
+  scrollTo(id: string) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   }
 
   onContainerMouseMove(e: MouseEvent) {
@@ -747,17 +814,4 @@ export class LandingComponent {
     target.style.setProperty('--mouse-x', `${x}px`);
     target.style.setProperty('--mouse-y', `${y}px`);
   }
-
-  onVaultSliderChange(event: any) {
-    this.simulatedVaultAmount.set(Number(event.target.value));
-  }
-
-  getInstallmentList(): number[] {
-    const list: number[] = [];
-    for (let i = 1; i <= this.simulatedInstallments(); i++) {
-      list.push(i);
-    }
-    return list;
-  }
 }
-

@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface FamilyMemberItem {
   id: string;
@@ -54,7 +55,7 @@ export interface MyFamilyResponse {
 })
 export class FamilyService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/family';
+  private get apiUrl() { return `${environment.apiUrl}/family`; }
 
   familyData = signal<MyFamilyResponse | null>(null);
   loading = signal(false);

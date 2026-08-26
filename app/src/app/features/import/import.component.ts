@@ -25,62 +25,61 @@ import { Account, Category, ImportBatchPreview, ImportItem } from '../../core/mo
     BottomNavComponent,
   ],
   template: `
-    <div class="h-screen flex flex-col overflow-hidden bg-surface-950">
+    <div class="h-screen flex flex-col overflow-hidden bg-black text-[#ededed] font-sans">
       <app-header class="shrink-0 z-30" />
 
       <div class="flex-1 flex overflow-hidden min-h-0 pb-16 md:pb-0">
-        <app-sidebar class="shrink-0 overflow-y-auto hidden md:block border-r border-surface-800" />
+        <app-sidebar class="shrink-0 overflow-y-auto hidden md:block border-r border-neutral-800" />
 
         <main class="flex-1 overflow-y-auto min-h-0 p-4 md:p-8 max-w-7xl mx-auto w-full space-y-6 animate-fade-in">
           <!-- Cabeçalho -->
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div class="flex items-center gap-2">
-                <h1 class="text-2xl font-bold text-white font-display">Motor de Importação Inteligente</h1>
-                <span class="px-2.5 py-0.5 rounded-full bg-brand-500/20 text-brand-400 border border-brand-500/30 text-xs font-semibold flex items-center gap-1">
-                  <span>✨</span>
-                  <span>Anti-Duplicidade & Auto-Categorização</span>
+                <h1 class="text-2xl font-bold text-white tracking-tight">Importação de Extratos</h1>
+                <span class="px-2.5 py-0.5 rounded-full bg-neutral-900 text-neutral-300 border border-neutral-800 text-xs font-mono">
+                  Deduplicação FITID
                 </span>
               </div>
-              <p class="text-xs md:text-sm text-surface-400 mt-0.5">
-                Upload de arquivos <strong>.OFX</strong> ou <strong>.CSV</strong> com limpeza de descrições e bloqueio de lançamentos repetidos.
+              <p class="text-xs text-neutral-400 mt-0.5">
+                Upload de arquivos <strong>.OFX</strong> ou <strong>.CSV</strong> bancários com neutralização de duplicatas
               </p>
             </div>
           </div>
 
           <!-- Card de Upload e Configuração -->
           @if (!preview()) {
-            <div class="max-w-2xl mx-auto space-y-6">
-              <div class="p-6 rounded-3xl bg-surface-900/70 border border-surface-800 backdrop-blur-sm space-y-4">
+            <div class="max-w-xl mx-auto space-y-5">
+              <div class="p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800 space-y-4">
                 <div>
-                  <label class="block text-xs font-semibold text-surface-300 uppercase mb-1.5">
-                    1. Selecione a Conta Bancária de Destino
+                  <label class="block text-[11px] font-mono text-neutral-400 uppercase mb-1.5">
+                    1. Conta Bancária de Destino
                   </label>
                   <div class="relative">
                     <select
                       [(ngModel)]="selectedAccountId"
-                      class="w-full appearance-none pl-4 pr-10 py-3 rounded-2xl bg-surface-950 border border-surface-700 text-white text-sm focus:outline-none focus:border-brand-500 cursor-pointer"
+                      class="w-full appearance-none pl-3.5 pr-8 py-2.5 rounded-xl bg-black border border-neutral-800 text-white text-xs focus:outline-none focus:border-neutral-500 cursor-pointer"
                     >
                       @for (acc of accounts(); track acc.id) {
-                        <option [value]="acc.id" class="bg-surface-900 text-white">{{ acc.name }} (Saldo atual: {{ acc.currentBalance | currencyBrl }})</option>
+                        <option [value]="acc.id" class="bg-neutral-900 text-white">{{ acc.name }} (Saldo: {{ acc.currentBalance | currencyBrl }})</option>
                       }
                     </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-surface-400">
-                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-neutral-500">
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                       </svg>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label class="block text-xs font-semibold text-surface-300 uppercase mb-1.5">
-                    2. Envie o Arquivo .OFX ou .CSV (Ex: Sicredi, Nubank, Itaú)
+                  <label class="block text-[11px] font-mono text-neutral-400 uppercase mb-1.5">
+                    2. Arquivo .OFX ou .CSV (Nubank, Itaú, Inter, Sicredi...)
                   </label>
                   <div
                     (dragover)="onDragOver($event)"
                     (drop)="onDrop($event)"
-                    class="border-2 border-dashed border-surface-700 hover:border-brand-500 rounded-3xl p-8 text-center transition-colors cursor-pointer bg-surface-950/40 relative"
+                    class="border border-dashed border-neutral-800 hover:border-neutral-600 rounded-2xl p-8 text-center transition-colors cursor-pointer bg-black relative"
                   >
                     <input
                       type="file"
@@ -89,18 +88,18 @@ import { Account, Category, ImportBatchPreview, ImportItem } from '../../core/mo
                       class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                     />
 
-                    <div class="w-12 h-12 rounded-2xl bg-brand-500/10 text-brand-400 mx-auto flex items-center justify-center mb-3">
-                      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div class="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 text-neutral-400 mx-auto flex items-center justify-center mb-2.5">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
                     </div>
 
                     @if (selectedFile(); as file) {
-                      <p class="text-sm font-bold text-white">{{ file.name }}</p>
-                      <p class="text-xs text-surface-400 mt-1">Clique para trocar de arquivo</p>
+                      <p class="text-xs font-mono font-bold text-white">{{ file.name }}</p>
+                      <p class="text-[10px] text-neutral-500 mt-0.5">Clique para alterar o arquivo</p>
                     } @else {
-                      <p class="text-sm font-semibold text-surface-200">Arraste seu arquivo aqui ou clique para selecionar</p>
-                      <p class="text-xs text-surface-500 mt-1">Extensões aceitas: .OFX e .CSV</p>
+                      <p class="text-xs font-medium text-neutral-300">Arraste seu arquivo aqui ou clique para selecionar</p>
+                      <p class="text-[10px] font-mono text-neutral-500 mt-1">Formatos aceitos: .OFX ou .CSV</p>
                     }
                   </div>
                 </div>
@@ -108,55 +107,42 @@ import { Account, Category, ImportBatchPreview, ImportItem } from '../../core/mo
                 <button
                   (click)="uploadAndParse()"
                   [disabled]="!selectedFile() || !selectedAccountId || loading()"
-                  class="w-full py-3.5 rounded-2xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white font-bold text-sm shadow-lg shadow-brand-500/20 transition-all flex items-center justify-center gap-2"
+                  class="w-full py-3 rounded-xl btn-vercel-primary text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   @if (loading()) {
-                    <div class="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    <span>Processando e Normalizando...</span>
+                    <div class="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
+                    <span>Processando extrato...</span>
                   } @else {
-                    <span>🚀</span>
-                    <span>Analisar e Pré-Visualizar Extrato</span>
+                    <span>Analisar e Pré-Visualizar</span>
                   }
                 </button>
-              </div>
-
-              <!-- Dicas de Formato -->
-              <div class="p-5 rounded-3xl bg-surface-900/40 border border-surface-800/80 space-y-2 text-xs text-surface-400">
-                <div class="flex items-center gap-2 text-surface-200 font-semibold">
-                  <span>💡</span>
-                  <span>Dica de Compatibilidade:</span>
-                </div>
-                <p>
-                  O motor detecta automaticamente colunas de data, valor, código de transação e identificadores únicos de qualquer banco.
-                </p>
               </div>
             </div>
           } @else {
             <!-- Preview dos Dados Importados -->
             @if (preview(); as p) {
-              <div class="space-y-6 animate-fade-in">
-                <!-- Alerta de Lote ou Duplicatas -->
+              <div class="space-y-4 animate-fade-in">
                 @if (p.isDuplicateBatch) {
-                  <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 flex items-start gap-3">
-                    <span class="text-xl">⚠️</span>
+                  <div class="p-3.5 rounded-xl bg-amber-950/20 border border-amber-900/50 text-amber-300 text-xs flex items-start gap-2.5">
+                    <span class="text-sm">⚠️</span>
                     <div>
-                      <h4 class="text-sm font-bold text-white">Aviso de Lote já Importado</h4>
-                      <p class="text-xs mt-0.5">
-                        Detectamos que este arquivo ou suas transações já foram conciliadas anteriormente. Os lançamentos repetidos vêm desmarcados por padrão.
+                      <h4 class="font-bold text-white">Aviso de Conciliação</h4>
+                      <p class="text-neutral-400 mt-0.5">
+                        Transações repetidas foram identificadas e desmarcadas automaticamente pela trava anti-duplicidade.
                       </p>
                     </div>
                   </div>
                 }
 
                 <!-- Barra de Ações Rápidas -->
-                <div class="p-4 rounded-3xl bg-surface-900/80 border border-surface-800 flex flex-wrap items-center justify-between gap-4 backdrop-blur-md">
+                <div class="p-4 rounded-2xl bg-[#0c0c0e] border border-neutral-800 flex flex-wrap items-center justify-between gap-3 font-mono text-xs">
                   <div class="flex items-center gap-3">
-                    <span class="text-xs text-surface-300">
+                    <span class="text-neutral-300">
                       <strong>{{ countSelectedItems() }}</strong> de <strong>{{ p.totalItems }}</strong> selecionados
                     </span>
                     @if (countDuplicateItems() > 0) {
-                      <span class="px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 text-[11px] font-semibold">
-                        {{ countDuplicateItems() }} já importados
+                      <span class="px-2 py-0.5 rounded bg-rose-950/40 text-rose-400 border border-rose-900/50 text-[10px]">
+                        {{ countDuplicateItems() }} duplicatas neutralizadas
                       </span>
                     }
                   </div>
@@ -164,118 +150,109 @@ import { Account, Category, ImportBatchPreview, ImportItem } from '../../core/mo
                   <div class="flex items-center gap-2">
                     <button
                       (click)="selectAllNew()"
-                      class="px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-surface-200 text-xs font-semibold border border-surface-700 transition-colors"
+                      class="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs border border-neutral-800 transition-colors cursor-pointer"
                     >
-                      Selecionar Apenas Novos
+                      Apenas Novos
                     </button>
                     <button
                       (click)="selectAll(true)"
-                      class="px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-surface-200 text-xs font-semibold border border-surface-700 transition-colors"
+                      class="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs border border-neutral-800 transition-colors cursor-pointer"
                     >
                       Marcar Todos
                     </button>
                     <button
                       (click)="selectAll(false)"
-                      class="px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-surface-200 text-xs font-semibold border border-surface-700 transition-colors"
+                      class="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs border border-neutral-800 transition-colors cursor-pointer"
                     >
                       Desmarcar Todos
                     </button>
                     <button
                       (click)="cancelPreview()"
-                      class="px-3 py-1.5 rounded-xl bg-surface-800 hover:bg-surface-700 text-surface-300 text-xs font-semibold transition-colors"
+                      class="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-neutral-500 hover:text-white text-xs border border-neutral-800 transition-colors cursor-pointer"
                     >
                       Cancelar
                     </button>
                     <button
                       (click)="confirmImport()"
                       [disabled]="loading() || countSelectedItems() === 0"
-                      class="px-5 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 disabled:opacity-50 text-white text-xs font-bold shadow-lg shadow-brand-500/20 transition-all flex items-center gap-2"
+                      class="px-4 py-1.5 btn-vercel-primary text-xs font-semibold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                     >
                       @if (loading()) {
-                        <div class="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent"></div>
+                        <div class="w-3 h-3 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
                         <span>Salvando...</span>
                       } @else {
-                        <span>Confirmar e Importar</span>
+                        <span>Confirmar Importação</span>
                       }
                     </button>
                   </div>
                 </div>
 
                 <!-- Tabela de Itens para Revisão -->
-                <div class="p-6 rounded-3xl bg-surface-900/70 border border-surface-800 backdrop-blur-sm overflow-hidden">
+                <div class="p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800 overflow-hidden">
                   <div class="overflow-x-auto">
-                    <table class="w-full text-left text-xs">
-                      <thead class="text-surface-400 border-b border-surface-800 uppercase tracking-wider text-[10px]">
+                    <table class="w-full text-left text-xs font-mono">
+                      <thead class="text-neutral-500 border-b border-neutral-800 uppercase text-[10px]">
                         <tr>
                           <th class="pb-3 w-8">Imp.</th>
-                          <th class="pb-3 font-semibold">Data</th>
-                          <th class="pb-3 font-semibold">Descrição Normalizada</th>
-                          <th class="pb-3 font-semibold">Categoria Sugerida</th>
-                          <th class="pb-3 font-semibold text-right">Valor</th>
+                          <th class="pb-3 font-medium">Data</th>
+                          <th class="pb-3 font-medium">Descrição</th>
+                          <th class="pb-3 font-medium">Categoria Sugerida</th>
+                          <th class="pb-3 font-medium text-right">Valor</th>
                         </tr>
                       </thead>
-                      <tbody class="divide-y divide-surface-800/60">
+                      <tbody class="divide-y divide-neutral-850 text-neutral-300">
                         @for (item of p.items; track item.id) {
                           <tr
                             class="transition-colors"
-                            [ngClass]="item.isDuplicate ? 'bg-surface-950/40 opacity-75' : 'hover:bg-surface-800/30'"
+                            [ngClass]="item.isDuplicate ? 'opacity-60 bg-rose-950/10' : 'hover:bg-neutral-900/40'"
                           >
-                            <td class="py-3.5">
+                            <td class="py-3">
                               <input
                                 type="checkbox"
                                 [(ngModel)]="item.shouldImport"
-                                class="w-4 h-4 rounded border-surface-700 bg-surface-950 text-brand-500 focus:ring-brand-500/30"
+                                class="w-3.5 h-3.5 rounded bg-black border-neutral-800 text-white cursor-pointer"
                               />
                             </td>
-                            <td class="py-3.5 text-surface-400 whitespace-nowrap">{{ item.date | date:'dd/MM/yyyy' }}</td>
-                            <td class="py-3.5">
+                            <td class="py-3 text-neutral-500 whitespace-nowrap">{{ item.date | date:'dd/MM/yyyy' }}</td>
+                            <td class="py-3 font-sans">
                               <div class="flex items-center gap-2">
                                 <span
-                                  class="w-2.5 h-2.5 rounded-full shrink-0"
+                                  class="w-1.5 h-1.5 rounded-full shrink-0"
                                   [ngClass]="item.type === 'INCOME' ? 'bg-emerald-400' : 'bg-rose-400'"
                                 ></span>
                                 <input
                                   type="text"
                                   [(ngModel)]="item.description"
-                                  class="w-full max-w-sm px-2.5 py-1 rounded-lg bg-surface-950 border border-surface-700 text-white text-xs focus:border-brand-500 focus:outline-none"
+                                  class="w-full max-w-xs px-2 py-1 rounded bg-black border border-neutral-800 text-white text-xs focus:border-neutral-500 focus:outline-none"
                                 />
                                 @if (item.isDuplicate) {
-                                  <span class="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 border border-rose-500/30 text-[10px] font-bold shrink-0">
-                                    ⚠️ Já Importado
+                                  <span class="px-1.5 py-0.5 rounded bg-rose-950 text-rose-400 border border-rose-900/50 text-[9px] font-mono font-bold shrink-0">
+                                    DUPLICATA
                                   </span>
                                 }
                               </div>
-                              <div class="text-[10px] text-surface-500 mt-0.5 pl-4 truncate max-w-md" title="{{ item.memo }}">
-                                Original: {{ item.memo }}
-                              </div>
                             </td>
-                            <td class="py-3.5">
-                              <div class="flex items-center gap-1.5 mb-1">
-                                <span class="text-[10px] text-surface-400">Sugestão:</span>
-                                <span class="px-1.5 py-0.5 rounded bg-brand-500/10 text-brand-400 text-[10px] font-semibold border border-brand-500/20">
-                                  {{ item.suggestedCategoryName || 'Geral' }}
-                                </span>
-                              </div>
-                              <div class="relative max-w-[200px]">
+                            <td class="py-3">
+                              <div class="relative max-w-[180px]">
                                 <select
                                   [(ngModel)]="item.categoryId"
-                                  class="w-full appearance-none pl-2.5 pr-7 py-1.5 rounded-xl bg-surface-950 border border-surface-700 text-white text-xs focus:border-brand-500 focus:outline-none cursor-pointer"
+                                  class="w-full appearance-none pl-2.5 pr-7 py-1 rounded-lg bg-black border border-neutral-800 text-white text-xs focus:border-neutral-500 focus:outline-none cursor-pointer"
                                 >
-                                  <option value="" class="bg-surface-900 text-white">Sem categoria</option>
+                                  <option value="" class="bg-neutral-900 text-white">Sem categoria</option>
                                   @for (cat of categories(); track cat.id) {
-                                    <option [value]="cat.id" class="bg-surface-900 text-white">{{ cat.name }}</option>
+                                    <option [value]="cat.id" class="bg-neutral-900 text-white">{{ cat.name }}</option>
                                   }
                                 </select>
-                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-surface-400">
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-500">
                                   <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                   </svg>
                                 </div>
                               </div>
                             </td>
                             <td
-                              class="py-3.5 text-right font-bold text-sm whitespace-nowrap"
-                              [ngClass]="item.type === 'INCOME' ? 'text-emerald-400' : 'text-rose-400'"
+                              class="py-3 text-right font-bold whitespace-nowrap"
+                              [ngClass]="item.type === 'INCOME' ? 'text-emerald-400' : 'text-white'"
                             >
                               {{ item.type === 'EXPENSE' ? '-' : '+' }}{{ item.amount | currencyBrl }}
                             </td>
@@ -381,7 +358,7 @@ export class ImportComponent implements OnInit {
         this.preview.set(previewData);
         this.loading.set(false);
         this.toastService.info(
-          `${previewData.totalItems} lançamentos lidos com sucesso (${previewData.totalDuplicates} duplicatas identificadas).`,
+          `${previewData.totalItems} lançamentos lidos (${previewData.totalDuplicates} duplicatas neutralizadas).`,
           'Extrato Analisado'
         );
       },

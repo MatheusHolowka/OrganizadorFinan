@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Vault } from '../models';
+import { environment } from '../../../environments/environment';
 
 export interface VaultsResponse {
   summary: {
@@ -18,7 +19,7 @@ export interface VaultsResponse {
 })
 export class VaultsService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/vaults';
+  private get apiUrl() { return `${environment.apiUrl}/vaults`; }
 
   private _data = signal<VaultsResponse | null>(null);
   private _loading = signal<boolean>(false);

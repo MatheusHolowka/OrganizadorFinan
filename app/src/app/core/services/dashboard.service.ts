@@ -2,13 +2,14 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { DashboardSummary } from '../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DashboardService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/dashboard';
+  private get apiUrl() { return `${environment.apiUrl}/dashboard`; }
 
   private _summary = signal<DashboardSummary | null>(null);
   private _loading = signal<boolean>(false);

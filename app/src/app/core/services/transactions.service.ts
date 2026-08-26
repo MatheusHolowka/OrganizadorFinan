@@ -2,6 +2,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { Transaction } from '../models';
+import { environment } from '../../../environments/environment';
 
 export interface TransactionsResponse {
   period: { month: number; year: number };
@@ -18,7 +19,7 @@ export interface TransactionsResponse {
 })
 export class TransactionsService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/transactions';
+  private get apiUrl() { return `${environment.apiUrl}/transactions`; }
 
   private _data = signal<TransactionsResponse | null>(null);
   private _loading = signal<boolean>(false);

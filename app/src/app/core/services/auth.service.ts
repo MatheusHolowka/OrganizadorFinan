@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { AuthResponse, User } from '../models';
+import { environment } from '../../../environments/environment';
 
 export interface RegisterResponse {
   message: string;
@@ -16,7 +17,7 @@ export interface RegisterResponse {
 export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private get apiUrl() { return `${environment.apiUrl}/auth`; }
 
   private _currentUser = signal<User | null>(null);
   private _token = signal<string | null>(null);

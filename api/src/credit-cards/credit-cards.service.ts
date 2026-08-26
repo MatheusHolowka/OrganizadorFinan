@@ -266,6 +266,32 @@ export class CreditCardsService {
     });
   }
 
+  async deleteTransaction(userId: string, transactionId: string) {
+    const tx = await this.prisma.creditCardTransaction.findUnique({
+      where: { id: transactionId },
+      include: { creditCard: true, invoice: true },
+    });
+
+    if (!tx || tx.creditCard.userId !== userId) {
+      throw new NotFoundException('Transação de cartão não encontrada');
+    }
+
+    return this.prisma.$transaction(async (prismaTx) => {
+      await prismaTx.creditCardTransaction.delete({
+        where: { id: transactionId },
+      });
+
+      await prismaTx.creditCardInvoice.update({
+        where: { id: tx.invoiceId },
+        data: {
+          totalAmount: { decrement: Number(tx.installmentAmount) },
+        },
+      });
+
+      return { message: 'Transação removida da fatura com sucesso' };
+    });
+  }
+
   private async getOrCreateInvoice(
     creditCardId: string,
     referenceMonth: number,

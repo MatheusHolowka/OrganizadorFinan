@@ -44,6 +44,14 @@ export class CreditCardsController {
     return this.creditCardsService.payInvoice(userId, invoiceId, dto);
   }
 
+  @Delete('transactions/:id')
+  async deleteTransaction(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+  ) {
+    return this.creditCardsService.deleteTransaction(userId, id);
+  }
+
   @Delete(':id')
   async remove(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.creditCardsService.remove(userId, id);

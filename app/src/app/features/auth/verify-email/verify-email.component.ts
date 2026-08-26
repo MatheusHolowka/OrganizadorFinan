@@ -10,26 +10,22 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   template: `
-    <div class="min-h-screen flex items-center justify-center p-4 bg-surface-950 relative overflow-hidden">
-      <!-- Background glows -->
-      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div class="relative w-full max-w-md p-8 rounded-3xl bg-surface-900/85 border border-surface-700/80 backdrop-blur-xl shadow-glass-dark animate-slide-up text-center">
+    <div class="min-h-screen flex items-center justify-center p-4 bg-black text-[#ededed] relative overflow-hidden font-sans">
+      <div class="relative w-full max-w-[400px] p-8 rounded-2xl bg-[#0c0c0e] border border-neutral-800 shadow-2xl animate-slide-up text-center z-10">
         <!-- ESTADO: SUCESSO -->
         @if (isSuccess()) {
-          <div class="py-8 space-y-4 animate-fade-in">
-            <div class="w-16 h-16 rounded-3xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mx-auto flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/20">
+          <div class="py-6 space-y-4 animate-fade-in">
+            <div class="w-12 h-12 rounded-xl bg-white text-black font-bold mx-auto flex items-center justify-center text-xl shadow-[0_0_15px_rgba(255,255,255,0.3)]">
               ✓
             </div>
-            <h2 class="text-2xl font-bold text-white font-display">E-mail Confirmado com Sucesso!</h2>
-            <p class="text-xs text-surface-300 leading-relaxed max-w-xs mx-auto">
-              Sua conta foi ativada. Redirecionando você para o painel...
+            <h2 class="text-xl font-bold text-white tracking-tight">E-mail Confirmado!</h2>
+            <p class="text-xs text-neutral-400 leading-relaxed max-w-xs mx-auto">
+              Sua conta foi ativada. Redirecionando para o dashboard...
             </p>
-            <div class="pt-3">
+            <div class="pt-2">
               <a
                 routerLink="/dashboard"
-                class="w-full py-3 px-4 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs shadow-lg shadow-brand-500/25 transition-all inline-block"
+                class="w-full py-2.5 px-4 btn-vercel-primary text-xs font-semibold inline-block"
               >
                 Ir para o Dashboard
               </a>
@@ -40,32 +36,32 @@ import { ToastService } from '../../../core/services/toast.service';
         <!-- ESTADO: FORMULÁRIO DE CÓDIGO DE 6 DÍGITOS -->
         @else {
           <div>
-            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-500/15 text-brand-400 border border-brand-500/20 text-2xl mb-4 shadow-lg shadow-brand-500/10">
-              ✉️
+            <div class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-white text-black font-bold text-sm shadow-[0_0_15px_rgba(255,255,255,0.3)] mb-3">
+              ▲
             </div>
-            <h1 class="text-2xl font-bold text-white font-display">Confirme seu E-mail</h1>
-            <p class="text-xs text-surface-400 mt-1">
-              Enviamos um código de 6 dígitos para o seu e-mail:
+            <h1 class="text-xl font-extrabold text-white tracking-tight">Confirme seu E-mail</h1>
+            <p class="text-xs text-neutral-400 mt-1">
+              Enviamos um código de 6 dígitos para:
             </p>
-            <div class="mt-1 px-3 py-1 bg-surface-950/80 rounded-full border border-surface-800 inline-block text-xs font-semibold text-brand-300">
+            <div class="mt-1.5 px-3 py-1 bg-black rounded-full border border-neutral-800 inline-block text-[11px] font-mono text-neutral-300">
               {{ email || 'seu e-mail' }}
             </div>
 
             @if (errorMessage()) {
-              <div class="mt-5 p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs flex items-center justify-center gap-2">
+              <div class="mt-4 p-2.5 rounded-xl bg-rose-950/20 border border-rose-900/50 text-rose-300 text-xs flex items-center justify-center gap-2">
                 <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <span>{{ errorMessage() }}</span>
+                <span class="leading-tight">{{ errorMessage() }}</span>
               </div>
             }
 
             <!-- 6 INPUTS DE OTP -->
             <div class="my-6">
-              <label class="block text-[11px] font-bold text-surface-400 uppercase tracking-wider mb-3">
-                Digite o Código de 6 Dígitos
+              <label class="block text-[11px] font-mono text-neutral-400 uppercase mb-3">
+                Código de 6 Dígitos
               </label>
-              <div class="flex justify-center items-center gap-2 sm:gap-3" (paste)="onPaste($event)">
+              <div class="flex justify-center items-center gap-2" (paste)="onPaste($event)">
                 @for (digit of digits; track $index) {
                   <input
                     #digitInput
@@ -76,8 +72,8 @@ import { ToastService } from '../../../core/services/toast.service';
                     (input)="onInput($event, $index)"
                     (keydown)="onKeyDown($event, $index)"
                     (focus)="onFocus($index)"
-                    class="w-11 h-13 sm:w-12 sm:h-14 text-center text-xl font-bold rounded-2xl bg-surface-950 border text-white transition-all focus:outline-none focus:scale-105"
-                    [ngClass]="digits[$index] ? 'border-brand-500 text-brand-400 bg-brand-500/5 shadow-md shadow-brand-500/10' : 'border-surface-700 text-white focus:border-brand-500'"
+                    class="w-10 h-12 text-center text-lg font-mono font-bold rounded-xl bg-black border text-white transition-all focus:outline-none"
+                    [ngClass]="digits[$index] ? 'border-white text-white' : 'border-neutral-800 text-neutral-400 focus:border-neutral-500'"
                   />
                 }
               </div>
@@ -88,38 +84,38 @@ import { ToastService } from '../../../core/services/toast.service';
               type="button"
               (click)="submitCode()"
               [disabled]="isCodeIncomplete || loading()"
-              class="w-full py-3.5 px-4 rounded-2xl bg-brand-500 hover:bg-brand-600 disabled:opacity-40 text-white font-bold shadow-lg shadow-brand-500/25 transition-all text-xs sm:text-sm flex items-center justify-center gap-2"
+              class="w-full py-3 px-4 btn-vercel-primary text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer"
             >
               @if (loading()) {
-                <div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <div class="w-3.5 h-3.5 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
                 <span>Validando Código...</span>
               } @else {
-                <span>Confirmar e Ativar Conta</span>
+                <span>Confirmar e Ativar</span>
               }
             </button>
 
-            <!-- REENVIAR CÓDIGO COM CONTADOR -->
-            <div class="mt-6 pt-4 border-t border-surface-800/80 text-xs text-surface-400 space-y-2">
-              <p>Não recebeu o código no e-mail?</p>
+            <!-- REENVIAR CÓDIGO -->
+            <div class="mt-5 pt-4 border-t border-neutral-800/80 text-xs text-neutral-500 space-y-1.5 font-sans">
+              <p>Não recebeu o código?</p>
               @if (resendCooldown() > 0) {
-                <span class="text-surface-500 font-medium">
-                  Aguarde <strong class="text-surface-300">{{ resendCooldown() }}s</strong> para reenviar
+                <span class="text-neutral-400 font-mono text-[11px]">
+                  Aguarde <strong class="text-white">{{ resendCooldown() }}s</strong> para reenviar
                 </span>
               } @else {
                 <button
                   type="button"
                   (click)="resendCode()"
                   [disabled]="resendLoading()"
-                  class="font-bold text-brand-400 hover:text-brand-300 underline transition-colors"
+                  class="text-xs text-white underline hover:text-neutral-300 cursor-pointer"
                 >
-                  {{ resendLoading() ? 'Reenviando...' : 'Reenviar Novo Código' }}
+                  {{ resendLoading() ? 'Reenviando...' : 'Reenviar Código' }}
                 </button>
               }
             </div>
 
             <div class="mt-4 text-center">
-              <a routerLink="/login" class="text-xs text-surface-500 hover:text-surface-300">
-                ← Voltar para a tela de Login
+              <a routerLink="/login" class="text-xs text-neutral-500 hover:text-neutral-300">
+                ← Voltar para o Login
               </a>
             </div>
           </div>
@@ -172,14 +168,13 @@ export class VerifyEmailComponent implements OnInit, AfterViewInit {
 
   onInput(event: Event, index: number) {
     const input = event.target as HTMLInputElement;
-    const value = input.value.replace(/\D/g, ''); // apenas números
+    const value = input.value.replace(/\D/g, '');
 
     if (value) {
-      this.digits[index] = value.slice(-1); // pega o último caractere digitado
+      this.digits[index] = value.slice(-1);
       input.value = this.digits[index];
       this.errorMessage.set(null);
 
-      // Avança para o próximo campo
       if (index < 5) {
         this.focusInput(index + 1);
       } else if (!this.isCodeIncomplete) {

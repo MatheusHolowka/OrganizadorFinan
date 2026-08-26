@@ -2,13 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ImportBatchPreview } from '../models';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ImportService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:3000/api/import';
+  private get apiUrl() { return `${environment.apiUrl}/import`; }
 
   uploadFile(accountId: string, file: File): Observable<ImportBatchPreview> {
     const formData = new FormData();

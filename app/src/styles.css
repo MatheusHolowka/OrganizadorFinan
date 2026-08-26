@@ -1,10 +1,26 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
-/* Estilos base e variáveis globais */
+/* ========================================================================= */
+/* VERCEL & CLERK DESIGN SYSTEM TOKENS                                      */
+/* ========================================================================= */
+
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', 'Inter', sans-serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Menlo', monospace;
+  
+  --bg-pure-black: #000000;
+  --bg-surface-1: #080809;
+  --bg-surface-2: #0f0f11;
+  --bg-surface-3: #161619;
+  
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-subtle-hover: rgba(255, 255, 255, 0.2);
+  --border-active: rgba(255, 255, 255, 0.35);
+  
+  --mint-primary: #00e599;
+  --mint-glow: rgba(0, 229, 153, 0.35);
 }
 
 body {
@@ -12,62 +28,24 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #030712;
-  color: #f8fafc;
+  background-color: var(--bg-pure-black);
+  color: #ededed;
   overflow-x: hidden;
 }
 
-/* Força cores escuras nativas em options e selects */
-select {
-  color-scheme: dark;
+/* Números tabulares para precisão contábil */
+.tabular-nums,
+.font-mono,
+[data-tabular="true"] {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
-select option {
-  background-color: #0f172a;
-  color: #f8fafc;
-  padding: 8px 12px;
-}
+/* ========================================================================= */
+/* ANIMATED LASER BEAMS & BORDER EFFECTS (VERCEL / CLERK STYLE)              */
+/* ========================================================================= */
 
-select option:checked {
-  background-color: #10b981 !important;
-  color: #ffffff !important;
-}
-
-/* Animações suaves para Toasts, Modais e Landing */
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    opacity: 0.4;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
-}
-
-@keyframes borderBeam {
+@keyframes borderBeamMove {
   0% {
     offset-distance: 0%;
   }
@@ -76,118 +54,216 @@ select option:checked {
   }
 }
 
-.animate-slide-up {
-  animation: slideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes laserShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(200%);
+  }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+@keyframes conicSpin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
-.animate-pulse-glow {
-  animation: pulseGlow 4s ease-in-out infinite;
+@keyframes pulseGaze {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
 }
 
-/* Glassmorphism & High-craft classes */
-.glass-panel {
-  background: rgba(15, 23, 42, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+@keyframes floatSoft {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
-.glass-card-pro {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.005) 100%), rgba(11, 15, 25, 0.7);
+.animate-float-soft {
+  animation: floatSoft 4s ease-in-out infinite;
+}
+
+.animate-pulse-gaze {
+  animation: pulseGaze 3s ease-in-out infinite;
+}
+
+/* Card with Animated Laser Border (Border Beam) */
+.border-beam-card {
+  position: relative;
+  background: rgba(10, 10, 12, 0.85);
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.border-beam-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 20%,
+    rgba(0, 229, 153, 0.6) 50%,
+    rgba(255, 255, 255, 0.1) 80%,
+    transparent 100%
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  animation: laserShimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* High-craft Floating Island Header (Clerk/Vercel style) */
+.floating-island-nav {
+  background: rgba(10, 10, 12, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.5),
+    0 8px 30px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+/* Vercel Glass Panel */
+.vercel-panel {
+  background: linear-gradient(180deg, rgba(16, 16, 20, 0.75) 0%, rgba(8, 8, 10, 0.95) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 
+    0 24px 60px -12px rgba(0, 0, 0, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
-.glass-card-pro:hover {
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 25px 50px -12px rgba(16, 185, 129, 0.12);
-  transform: translateY(-2px);
+/* Vercel High-Contrast Action Buttons */
+.btn-vercel-primary {
+  background: #ffffff;
+  color: #000000;
+  font-weight: 600;
+  border-radius: 0.625rem;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2), 0 2px 10px rgba(255, 255, 255, 0.2);
 }
 
-/* Tech Grid Background */
-.tech-grid {
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
-  background-size: 3.5rem 3.5rem;
-  mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 70%, transparent 100%);
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 70%, transparent 100%);
+.btn-vercel-primary:hover {
+  background: #eaeaea;
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.3), 0 4px 20px rgba(255, 255, 255, 0.35);
 }
 
-.dot-pattern {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
+.btn-vercel-secondary {
+  background: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-weight: 500;
+  border-radius: 0.625rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
-/* Text Gradients */
-.text-gradient-emerald {
-  background: linear-gradient(135deg, #ffffff 20%, #6ee7b7 60%, #10b981 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.btn-vercel-secondary:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
-.text-gradient-purple {
-  background: linear-gradient(135deg, #ffffff 30%, #c084fc 70%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.btn-vercel-mint {
+  background: #00e599;
+  color: #000000;
+  font-weight: 700;
+  border-radius: 0.625rem;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 0 25px rgba(0, 229, 153, 0.3);
 }
 
-.text-gradient-silver {
-  background: linear-gradient(180deg, #FFFFFF 0%, #94A3B8 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.btn-vercel-mint:hover {
+  background: #1affab;
+  transform: translateY(-1px);
+  box-shadow: 0 0 35px rgba(0, 229, 153, 0.5);
 }
 
-/* Glowing outline button */
-.btn-glow-emerald {
-  position: relative;
-  background: linear-gradient(135deg, #10b981, #059669);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* Custom Precision Slider */
+input[type="range"].vercel-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: #1f1f24;
+  border-radius: 9999px;
+  outline: none;
 }
 
-.btn-glow-emerald:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(16, 185, 129, 0.45), 0 0 60px rgba(16, 185, 129, 0.2);
+input[type="range"].vercel-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  border: 2px solid #000000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
-.glow-pill {
-  box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.15), 0 0 20px rgba(16, 185, 129, 0.1);
+input[type="range"].vercel-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.25);
+  box-shadow: 0 0 16px rgba(0, 229, 153, 0.8);
 }
 
-/* Interactive Mouse Spotlight Effects */
+input[type="range"].vercel-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+  border: 2px solid #000000;
+}
+
+/* Subtle mouse tracking spotlight */
 .mouse-spotlight {
   pointer-events: none;
   position: absolute;
   inset: 0;
   z-index: 1;
   background: radial-gradient(
-    700px circle at var(--mouse-x, 50vw) var(--mouse-y, 30vh),
-    rgba(16, 185, 129, 0.13),
-    rgba(139, 92, 246, 0.04) 35%,
-    transparent 70%
+    500px circle at var(--mouse-x, 50vw) var(--mouse-y, 30vh),
+    rgba(255, 255, 255, 0.04),
+    transparent 60%
   );
   transition: background 0.05s ease-out;
 }
 
-.spotlight-interactive-card {
-  position: relative;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.005) 100%), rgba(11, 15, 25, 0.75);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
 }
-
-.spotlight-interactive-card:hover {
-  border-color: rgba(16, 185, 129, 0.35);
-  box-shadow: 0 20px 40px -15px rgba(16, 185, 129, 0.12);
-  transform: translateY(-3px);
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f1f24;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #333338;
 }
 
