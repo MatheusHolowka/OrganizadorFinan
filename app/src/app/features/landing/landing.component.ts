@@ -17,7 +17,13 @@ interface GoalPreset {
   standalone: true,
   imports: [CommonModule, RouterLink, FormsModule, CurrencyBrlPipe],
   template: `
-    <div class="min-h-screen bg-[#030712] text-white selection:bg-brand-500 selection:text-white relative overflow-hidden font-sans">
+    <div 
+      (mousemove)="onContainerMouseMove($event)"
+      class="min-h-screen bg-[#030712] text-white selection:bg-brand-500 selection:text-white relative overflow-hidden font-sans"
+    >
+      <!-- Interactive Mouse Spotlight (Dynamic Background Glow that follows the cursor) -->
+      <div class="mouse-spotlight"></div>
+
       <!-- Background Tech Grids & Glow Accents -->
       <div class="absolute inset-0 tech-grid pointer-events-none z-0"></div>
       <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[1100px] h-[550px] bg-gradient-to-b from-brand-500/20 via-emerald-500/10 to-transparent blur-[140px] pointer-events-none z-0"></div>
@@ -732,6 +738,16 @@ export class LandingComponent {
     this.simMonthly = monthly;
   }
 
+  onContainerMouseMove(e: MouseEvent) {
+    const target = e.currentTarget as HTMLElement;
+    if (!target) return;
+    const rect = target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    target.style.setProperty('--mouse-x', `${x}px`);
+    target.style.setProperty('--mouse-y', `${y}px`);
+  }
+
   onVaultSliderChange(event: any) {
     this.simulatedVaultAmount.set(Number(event.target.value));
   }
@@ -744,3 +760,4 @@ export class LandingComponent {
     return list;
   }
 }
+
