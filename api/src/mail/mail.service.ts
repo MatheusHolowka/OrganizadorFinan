@@ -14,7 +14,7 @@ export class MailService {
     this.frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:4200');
     this.defaultFrom = this.configService.get<string>(
       'SMTP_FROM',
-      'FinanOrganizador <noreply@organizadorfinan.com.br>',
+      'FinanOrganizador <noreply@send.organizadorfinan.com.br>',
     );
 
     this.resendApiKey =
