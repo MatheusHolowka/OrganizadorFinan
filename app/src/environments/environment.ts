@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   get apiUrl(): string {
     if (typeof window !== 'undefined') {
       const win = window as any;
@@ -12,12 +12,22 @@ export const environment = {
         return 'http://localhost:3000/api';
       }
 
-      // Se o frontend estiver rodando em app.dominio.com, a API geralmente roda em api.dominio.com/api
+      // Tratamento para www.organizadorfinan.com.br -> api.organizadorfinan.com.br
+      if (host.startsWith('www.')) {
+        return `${protocol}//api.${host.replace('www.', '')}/api`;
+      }
+
+      // Tratamento para app.organizadorfinan.com.br -> api.organizadorfinan.com.br
       if (host.startsWith('app.')) {
         return `${protocol}//${host.replace('app.', 'api.')}/api`;
       }
 
-      // Se estiver em um subdomínio qualquer ou domínio principal com api no mesmo host
+      // Tratamento para domínio raiz: organizadorfinan.com.br -> api.organizadorfinan.com.br
+      if (host === 'organizadorfinan.com.br') {
+        return `${protocol}//api.organizadorfinan.com.br/api`;
+      }
+
+      // Qualquer outro domínio com subdomínio api
       if (host.includes('.')) {
         return `${protocol}//api.${host}/api`;
       }
