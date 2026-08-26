@@ -327,7 +327,7 @@ import { ModalComponent } from '../../shared/components/modal/modal.component';
                     <input
                       type="text"
                       [(ngModel)]="newFamilyName"
-                      placeholder="Ex: Família Holowka"
+                      placeholder="Ex: Família Silva"
                       class="flex-1 px-3.5 py-2.5 rounded-xl bg-surface-950 border border-surface-700 text-white text-xs focus:outline-none focus:border-indigo-500"
                     />
                     <button
