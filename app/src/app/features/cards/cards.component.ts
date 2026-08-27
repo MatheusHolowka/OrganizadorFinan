@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CardsService } from '../../core/services/cards.service';
@@ -11,6 +11,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { CustomSelectComponent, SelectOption } from '../../shared/components/custom-select/custom-select.component';
 import { Account, Category, CreditCard, CreditCardInvoice, CreditCardTransaction } from '../../core/models';
 
 @Component({
@@ -25,6 +26,7 @@ import { Account, Category, CreditCard, CreditCardInvoice, CreditCardTransaction
     SidebarComponent,
     BottomNavComponent,
     ModalComponent,
+    CustomSelectComponent,
   ],
   template: `
     <div class="h-screen flex flex-col overflow-hidden bg-black text-[#ededed] font-sans">
@@ -100,7 +102,14 @@ import { Account, Category, CreditCard, CreditCardInvoice, CreditCardTransaction
                   <div class="flex justify-between items-start">
                     <div>
                       <span class="text-[10px] uppercase font-mono tracking-widest text-neutral-500 font-bold">Cartão de Crédito</span>
-                      <h3 class="text-base font-bold text-white mt-0.5">{{ card.name }}</h3>
+                      <div class="flex items-center gap-2 mt-0.5">
+                        <h3 class="text-base font-bold text-white">{{ card.name }}</h3>
+                        @if (card.isArchived) {
+                          <span class="px-2 py-0.5 rounded-full bg-rose-950/60 text-rose-400 border border-rose-900/50 text-[9px] font-mono">
+                            Cancelado / Inativo
+                          </span>
+                        }
+                      </div>
                     </div>
                     <span class="px-2 py-0.5 rounded bg-neutral-900 border border-neutral-800 text-[10px] font-mono font-bold text-neutral-300 uppercase">
                       {{ card.brand }}
@@ -145,32 +154,26 @@ import { Account, Category, CreditCard, CreditCardInvoice, CreditCardTransaction
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-neutral-850">
                   <div>
                     <span class="text-[10px] uppercase font-mono text-neutral-500 font-bold">Extrato de Faturas</span>
-                    <h2 class="text-lg font-bold text-white flex items-center gap-2">
-                      <span>{{ card.name }}</span>
-                      <span class="text-xs font-normal text-neutral-400 font-mono">({{ card.brand }})</span>
-                    </h2>
+                    <div class="flex items-center gap-2">
+                      <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                        <span>{{ card.name }}</span>
+                        <span class="text-xs font-normal text-neutral-400 font-mono">({{ card.brand }})</span>
+                      </h2>
+                      @if (card.isArchived) {
+                        <span class="px-2.5 py-0.5 rounded-full bg-rose-950/60 text-rose-400 border border-rose-900/50 text-[10px] font-mono">
+                          Cancelado / Inativo
+                        </span>
+                      }
+                    </div>
                   </div>
 
                   <div class="flex flex-wrap items-center gap-2">
-                    <!-- Seletor de Faturas (Ciclos) -->
-                    <div class="relative">
-                      <select
-                        [ngModel]="selectedInvoiceId()"
-                        (ngModelChange)="onSelectInvoice($event)"
-                        class="appearance-none pl-3.5 pr-8 py-2 rounded-xl bg-black border border-neutral-800 text-white text-xs font-mono focus:outline-none focus:border-neutral-500 cursor-pointer"
-                      >
-                        @for (inv of card.invoices; track inv.id) {
-                          <option [value]="inv.id" class="bg-neutral-900 text-white">
-                            {{ getInvoiceMonthName(inv.referenceMonth) }}/{{ inv.referenceYear }} — {{ inv.totalAmount | currencyBrl }} ({{ getInvoiceStatusLabel(inv.status) }})
-                          </option>
-                        }
-                      </select>
-                      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-neutral-500">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
-                    </div>
+                    <!-- Seletor de Faturas (Ciclos) Custom Dark -->
+                    <app-custom-select
+                      [options]="invoiceOptions()"
+                      [value]="selectedInvoiceId()"
+                      (valueChange)="onSelectInvoice($event)"
+                    ></app-custom-select>
 
                     @if (selectedInvoice(); as inv) {
                       <button
@@ -181,6 +184,15 @@ import { Account, Category, CreditCard, CreditCardInvoice, CreditCardTransaction
                         {{ inv.status === 'PAID' ? 'Fatura Paga' : 'Pagar Fatura (' + (inv.totalAmount | currencyBrl) + ')' }}
                       </button>
                     }
+
+                    <button
+                      (click)="toggleArchiveCard(card)"
+                      class="px-3 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-xs font-medium transition-colors cursor-pointer flex items-center gap-1.5"
+                      [ngClass]="card.isArchived ? 'text-emerald-400 hover:text-emerald-300' : 'text-neutral-400 hover:text-rose-400'"
+                      [title]="card.isArchived ? 'Reativar Cartão' : 'Marcar como Cancelado / Inativo'"
+                    >
+                      <span>{{ card.isArchived ? 'Reativar Cartão' : 'Marcar como Cancelado' }}</span>
+                    </button>
 
                     <button
                       (click)="deleteCard(card)"
@@ -252,7 +264,7 @@ import { Account, Category, CreditCard, CreditCardInvoice, CreditCardTransaction
                             </tr>
                           </thead>
                           <tbody class="divide-y divide-neutral-850 text-neutral-300">
-                            @for (tx of inv.transactions; track tx.id) {
+                            @for (tx of paginatedPurchases(); track tx.id) {
                               <tr class="hover:bg-neutral-900/40 transition-colors">
                                 <td class="py-3.5 text-neutral-500">{{ tx.purchaseDate | date:'dd/MM/yyyy' }}</td>
                                 <td class="py-3.5 font-sans font-medium text-white">
@@ -290,6 +302,45 @@ import { Account, Category, CreditCard, CreditCardInvoice, CreditCardTransaction
                           </tbody>
                         </table>
                       </div>
+
+                      <!-- Paginação de Compras da Fatura -->
+                      @if (totalPurchases() > 10) {
+                        <div class="mt-4 pt-3 border-t border-neutral-850 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+                          <div class="text-neutral-500">
+                            Mostrando <span class="text-white font-bold">{{ startPurchaseIndex() + 1 }}</span> a
+                            <span class="text-white font-bold">{{ endPurchaseIndex() }}</span> de
+                            <span class="text-white font-bold">{{ totalPurchases() }}</span> compras
+                          </div>
+
+                          <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                            <button
+                              (click)="prevPurchasePage()"
+                              [disabled]="currentPurchasePage() === 1"
+                              class="px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                            >
+                              ← Anterior
+                            </button>
+
+                            @for (p of purchasePagesArray(); track p) {
+                              <button
+                                (click)="goToPurchasePage(p)"
+                                [ngClass]="currentPurchasePage() === p ? 'bg-white text-black font-bold border-white' : 'bg-neutral-900 text-neutral-400 hover:text-white border-neutral-800'"
+                                class="w-7 h-7 rounded-lg border text-xs flex items-center justify-center transition-all cursor-pointer"
+                              >
+                                {{ p }}
+                              </button>
+                            }
+
+                            <button
+                              (click)="nextPurchasePage()"
+                              [disabled]="currentPurchasePage() === totalPurchasePages()"
+                              class="px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                            >
+                              Próxima →
+                            </button>
+                          </div>
+                        </div>
+                      }
                     }
                   </div>
                 }
@@ -614,6 +665,23 @@ export class CardsComponent implements OnInit {
   selectedInvoiceId = signal<string | null>(null);
   selectedInvoice = signal<CreditCardInvoice | null>(null);
 
+  invoiceOptions = computed<SelectOption[]>(() => {
+    const card = this.selectedCardDetail();
+    if (!card || !card.invoices) return [];
+    return card.invoices.map((inv) => {
+      const monthName = this.getInvoiceMonthName(inv.referenceMonth);
+      const isPaid = inv.status === 'PAID';
+      const isOpen = inv.status === 'OPEN';
+      const sublabel = isOpen ? 'Fatura Aberta (Atual)' : this.getInvoiceStatusLabel(inv.status);
+      return {
+        value: inv.id,
+        label: `${monthName}/${inv.referenceYear} — R$ ${Number(inv.totalAmount).toFixed(2)}`,
+        sublabel,
+        color: isPaid ? '#10B981' : isOpen ? '#38BDF8' : '#F59E0B',
+      };
+    });
+  });
+
   isNewCardModalOpen = signal(false);
   isPurchaseModalOpen = signal(false);
   isPayModalOpen = signal(false);
@@ -675,11 +743,11 @@ export class CardsComponent implements OnInit {
       next: (cardDetail) => {
         this.selectedCardDetail.set(cardDetail);
         if (cardDetail.invoices && cardDetail.invoices.length > 0) {
-          // Selecionar a primeira fatura (normalmente a mais recente ou aberta)
-          const invId = this.selectedInvoiceId() && cardDetail.invoices.some((i) => i.id === this.selectedInvoiceId())
-            ? this.selectedInvoiceId()!
-            : cardDetail.invoices[0].id;
-          this.onSelectInvoice(invId);
+          // Prioriza a fatura aberta atual (status === 'OPEN'), ou a que o usuário já tinha selecionado, ou a mais recente
+          const openInvoice = cardDetail.invoices.find((i) => i.status === 'OPEN');
+          const alreadySelected = this.selectedInvoiceId() && cardDetail.invoices.find((i) => i.id === this.selectedInvoiceId());
+          const targetInvoice = alreadySelected || openInvoice || cardDetail.invoices[0];
+          this.onSelectInvoice(targetInvoice.id);
         } else {
           this.selectedInvoice.set(null);
         }
@@ -687,7 +755,56 @@ export class CardsComponent implements OnInit {
     });
   }
 
+  purchasePageSize = 10;
+  currentPurchasePage = signal<number>(1);
+
+  totalPurchases = computed(() => this.selectedInvoice()?.transactions?.length || 0);
+  totalPurchasePages = computed(() => Math.max(1, Math.ceil(this.totalPurchases() / this.purchasePageSize)));
+  startPurchaseIndex = computed(() => (this.currentPurchasePage() - 1) * this.purchasePageSize);
+  endPurchaseIndex = computed(() => Math.min(this.startPurchaseIndex() + this.purchasePageSize, this.totalPurchases()));
+
+  paginatedPurchases = computed(() => {
+    const list = this.selectedInvoice()?.transactions || [];
+    const start = this.startPurchaseIndex();
+    return list.slice(start, start + this.purchasePageSize);
+  });
+
+  purchasePagesArray = computed(() => {
+    const total = this.totalPurchasePages();
+    const current = this.currentPurchasePage();
+    const pages: number[] = [];
+    const maxButtons = 5;
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + maxButtons - 1);
+    if (end - start < maxButtons - 1) {
+      start = Math.max(1, end - maxButtons + 1);
+    }
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  });
+
+  goToPurchasePage(page: number) {
+    if (page >= 1 && page <= this.totalPurchasePages()) {
+      this.currentPurchasePage.set(page);
+    }
+  }
+
+  nextPurchasePage() {
+    if (this.currentPurchasePage() < this.totalPurchasePages()) {
+      this.currentPurchasePage.update((p) => p + 1);
+    }
+  }
+
+  prevPurchasePage() {
+    if (this.currentPurchasePage() > 1) {
+      this.currentPurchasePage.update((p) => p - 1);
+    }
+  }
+
   onSelectInvoice(invoiceId: string) {
+    this.currentPurchasePage.set(1);
     this.selectedInvoiceId.set(invoiceId);
     const card = this.selectedCardDetail();
     if (card && card.invoices) {
@@ -747,6 +864,29 @@ export class CardsComponent implements OnInit {
           this.loadCards();
         },
         error: (err) => this.toastService.error(err.error?.message || 'Erro ao excluir cartão.'),
+      });
+    }
+  }
+
+  async toggleArchiveCard(card: CreditCard) {
+    const isArchiving = !card.isArchived;
+    const confirmed = await this.dialogService.confirm({
+      title: `${isArchiving ? 'Cancelar / Inativar' : 'Reativar'} Cartão`,
+      message: isArchiving
+        ? `Deseja marcar o cartão "${card.name}" como cancelado/inativo? Ele não será mais considerado nos cálculos de limite do painel.`
+        : `Deseja reativar o cartão "${card.name}" para voltar a usá-lo e contabilizar nos limites?`,
+      confirmText: isArchiving ? 'Marcar como Cancelado' : 'Reativar Cartão',
+      cancelText: 'Voltar',
+      type: isArchiving ? 'warning' : 'info',
+    });
+
+    if (confirmed) {
+      this.cardsService.toggleArchive(card.id).subscribe({
+        next: (res) => {
+          this.toastService.success(res.message || 'Status do cartão alterado com sucesso!');
+          this.loadCards(card.id);
+        },
+        error: (err) => this.toastService.error(err.error?.message || 'Erro ao alterar status do cartão.'),
       });
     }
   }

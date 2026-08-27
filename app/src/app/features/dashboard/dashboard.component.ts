@@ -12,6 +12,8 @@ import { HeaderComponent } from '../../shared/components/header/header.component
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { CustomSelectComponent, SelectOption } from '../../shared/components/custom-select/custom-select.component';
 import { Account, AccountType, CategoryExpenseItem, CashFlowPoint } from '../../core/models';
 
 @Component({
@@ -22,11 +24,13 @@ import { Account, AccountType, CategoryExpenseItem, CashFlowPoint } from '../../
     FormsModule,
     ReactiveFormsModule,
     RouterLink,
+    NgApexchartsModule,
     CurrencyBrlPipe,
     HeaderComponent,
     SidebarComponent,
     BottomNavComponent,
     ModalComponent,
+    CustomSelectComponent,
   ],
   template: `
     <div class="h-screen flex flex-col overflow-hidden bg-black text-[#ededed] font-sans">
@@ -51,41 +55,19 @@ import { Account, AccountType, CategoryExpenseItem, CashFlowPoint } from '../../
             </div>
 
             <div class="flex flex-wrap items-center gap-2.5">
-              <!-- Filtro de Período -->
+              <!-- Filtro de Período Custom Dark -->
               <div class="flex items-center gap-1.5 p-1 rounded-xl bg-[#0c0c0e] border border-neutral-800">
-                <div class="relative">
-                  <select
-                    [(ngModel)]="selectedMonth"
-                    (change)="changePeriod()"
-                    class="appearance-none pl-3 pr-7 py-1.5 rounded-lg bg-black border border-neutral-800 text-white text-xs font-medium focus:outline-none focus:border-neutral-600 cursor-pointer"
-                  >
-                    @for (m of months; track m.value) {
-                      <option [value]="m.value" class="bg-neutral-900 text-white">{{ m.name }}</option>
-                    }
-                  </select>
-                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-500">
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
+                <app-custom-select
+                  [options]="monthOptions"
+                  [value]="selectedMonth"
+                  (valueChange)="onMonthChange($event)"
+                ></app-custom-select>
 
-                <div class="relative">
-                  <select
-                    [(ngModel)]="selectedYear"
-                    (change)="changePeriod()"
-                    class="appearance-none pl-3 pr-7 py-1.5 rounded-lg bg-black border border-neutral-800 text-white text-xs font-mono font-medium focus:outline-none focus:border-neutral-600 cursor-pointer"
-                  >
-                    @for (y of years; track y) {
-                      <option [value]="y" class="bg-neutral-900 text-white">{{ y }}</option>
-                    }
-                  </select>
-                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-500">
-                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
+                <app-custom-select
+                  [options]="yearOptions"
+                  [value]="selectedYear"
+                  (valueChange)="onYearChange($event)"
+                ></app-custom-select>
               </div>
 
               <button
@@ -95,14 +77,14 @@ import { Account, AccountType, CategoryExpenseItem, CashFlowPoint } from '../../
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                <span>+ Nova Conta</span>
+                <span>Nova Conta</span>
               </button>
 
               <a
                 routerLink="/cards"
                 class="px-3.5 py-1.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white border border-neutral-800 text-xs font-medium flex items-center gap-1.5 transition-all"
               >
-                <span>+ Compra Cartão</span>
+                <span>Compra Cartão</span>
               </a>
 
               <a
@@ -197,6 +179,49 @@ import { Account, AccountType, CategoryExpenseItem, CashFlowPoint } from '../../
                   Total em quarentena financeira
                 </div>
               </div>
+            </div>
+
+            <!-- BANNERS DE ACESSO RÁPIDO: INVESTIMENTOS & EMPRÉSTIMOS -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Card de Investimentos -->
+              <a
+                routerLink="/investments"
+                class="p-5 rounded-2xl bg-gradient-to-br from-[#0c0c0e] to-purple-950/20 border border-neutral-800 hover:border-purple-800/60 transition-all group flex items-center justify-between cursor-pointer"
+              >
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-lg bg-purple-950/80 border border-purple-800/60 text-purple-400 text-xs">📈</span>
+                    <h4 class="text-sm font-bold text-white group-hover:text-purple-300 transition-colors">Carteira de Investimentos</h4>
+                  </div>
+                  <p class="text-xs text-neutral-400">Renda fixa, fundos e ações sincronizados</p>
+                  <div class="text-xl font-bold font-mono text-purple-400 mt-2">
+                    {{ (summary.summary.totalInvestments || 0) | currencyBrl }}
+                  </div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 group-hover:text-white group-hover:translate-x-0.5 transition-all">
+                  →
+                </div>
+              </a>
+
+              <!-- Card de Empréstimos -->
+              <a
+                routerLink="/loans"
+                class="p-5 rounded-2xl bg-gradient-to-br from-[#0c0c0e] to-amber-950/20 border border-neutral-800 hover:border-amber-800/60 transition-all group flex items-center justify-between cursor-pointer"
+              >
+                <div class="space-y-1">
+                  <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-lg bg-amber-950/80 border border-amber-800/60 text-amber-400 text-xs">🤝</span>
+                    <h4 class="text-sm font-bold text-white group-hover:text-amber-300 transition-colors">Empréstimos & Dívidas</h4>
+                  </div>
+                  <p class="text-xs text-neutral-400">Saldo devedor e cronograma de quitação</p>
+                  <div class="text-xl font-bold font-mono text-rose-400 mt-2">
+                    {{ (summary.summary.totalLoans || 0) | currencyBrl }}
+                  </div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center text-neutral-400 group-hover:text-white group-hover:translate-x-0.5 transition-all">
+                  →
+                </div>
+              </a>
             </div>
 
             <!-- ========================================================================= -->
@@ -308,55 +333,30 @@ import { Account, AccountType, CategoryExpenseItem, CashFlowPoint } from '../../
             <!-- SEÇÃO DE GRÁFICOS VISUAIS: FLUXO DE CAIXA & CATEGORIAS                   -->
             <!-- ========================================================================= -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <!-- GRÁFICO 1: FLUXO DE CAIXA 6 MESES (BAR CHART INTERATIVO) -->
-              <div class="lg:col-span-2 p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800 flex flex-col justify-between space-y-5">
+              <!-- GRÁFICO 1: FLUXO DE CAIXA 6 MESES -->
+              <div class="lg:col-span-2 p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800 flex flex-col justify-between space-y-4">
                 <div>
                   <div class="flex justify-between items-center mb-1">
                     <h3 class="text-base font-bold text-white tracking-tight">Fluxo de Caixa Semestral</h3>
-                    <span class="text-[10px] font-mono text-neutral-500 uppercase">Histórico & Projeção</span>
                   </div>
-                  <p class="text-xs text-neutral-400">Comparativo de Receitas (verde) vs Despesas + Faturas (branco)</p>
+                  <p class="text-xs text-neutral-400">Comparativo de Receitas (verde) vs Despesas + Faturas (cinza)</p>
                 </div>
 
-                <!-- Canvas / SVG Bar Chart -->
-                <div class="h-56 w-full flex items-end justify-between gap-3 pt-6 pb-2 border-b border-neutral-850 font-mono text-xs">
-                  @for (point of summary.cashFlowHistory; track point.monthLabel) {
-                    <div class="flex-1 flex flex-col items-center h-full justify-end group relative cursor-pointer">
-                      <!-- Tooltip Hover -->
-                      <div class="absolute -top-12 bg-neutral-900 border border-neutral-700 text-[10px] rounded-lg px-2.5 py-1 text-center whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-20 pointer-events-none shadow-xl">
-                        <div class="text-emerald-400 font-bold">+{{ point.income | currencyBrl }}</div>
-                        <div class="text-rose-400 font-bold">-{{ (point.expense + point.invoice) | currencyBrl }}</div>
-                      </div>
-
-                      <!-- Barras Lado a Lado -->
-                      <div class="w-full flex items-end justify-center gap-1.5 h-full max-h-40">
-                        <!-- Barra Receita -->
-                        <div
-                          class="w-3 sm:w-4 bg-emerald-400 rounded-t transition-all duration-500 hover:bg-emerald-300"
-                          [style.height.%]="getBarHeight(point.income, summary.cashFlowHistory)"
-                        ></div>
-
-                        <!-- Barra Despesa Total -->
-                        <div
-                          class="w-3 sm:w-4 bg-neutral-300 rounded-t transition-all duration-500 hover:bg-white"
-                          [style.height.%]="getBarHeight(point.expense + point.invoice, summary.cashFlowHistory)"
-                        ></div>
-                      </div>
-
-                      <span class="text-[10px] text-neutral-400 mt-2 font-mono">{{ point.monthLabel }}</span>
-                    </div>
-                  }
-                </div>
-
-                <div class="flex items-center justify-center gap-6 text-xs font-mono text-neutral-400 pt-1">
-                  <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-sm bg-emerald-400"></span>
-                    <span>Receitas</span>
-                  </div>
-                  <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-sm bg-neutral-300"></span>
-                    <span>Despesas & Faturas</span>
-                  </div>
+                <!-- ApexChart Container -->
+                <div class="w-full pt-2">
+                  <apx-chart
+                    [series]="chartSeries"
+                    [chart]="chartOptions.chart"
+                    [colors]="chartOptions.colors"
+                    [plotOptions]="chartOptions.plotOptions"
+                    [dataLabels]="chartOptions.dataLabels"
+                    [stroke]="chartOptions.stroke"
+                    [xaxis]="chartOptions.xaxis"
+                    [yaxis]="chartOptions.yaxis"
+                    [grid]="chartOptions.grid"
+                    [tooltip]="chartOptions.tooltip"
+                    [legend]="chartOptions.legend"
+                  ></apx-chart>
                 </div>
               </div>
 
@@ -447,7 +447,7 @@ import { Account, AccountType, CategoryExpenseItem, CashFlowPoint } from '../../
                   <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" />
                   </svg>
-                  <span>+ Adicionar Conta Corrente</span>
+                  <span>Adicionar Conta Corrente</span>
                 </button>
               </div>
 
@@ -700,22 +700,28 @@ export class DashboardComponent implements OnInit {
   selectedMonth = new Date().getMonth() + 1;
   selectedYear = new Date().getFullYear();
 
-  months = [
-    { value: 1, name: 'Janeiro' },
-    { value: 2, name: 'Fevereiro' },
-    { value: 3, name: 'Março' },
-    { value: 4, name: 'Abril' },
-    { value: 5, name: 'Maio' },
-    { value: 6, name: 'Junho' },
-    { value: 7, name: 'Julho' },
-    { value: 8, name: 'Agosto' },
-    { value: 9, name: 'Setembro' },
-    { value: 10, name: 'Outubro' },
-    { value: 11, name: 'Novembro' },
-    { value: 12, name: 'Dezembro' },
+  monthOptions: SelectOption[] = [
+    { value: 1, label: 'Janeiro' },
+    { value: 2, label: 'Fevereiro' },
+    { value: 3, label: 'Março' },
+    { value: 4, label: 'Abril' },
+    { value: 5, label: 'Maio' },
+    { value: 6, label: 'Junho' },
+    { value: 7, label: 'Julho' },
+    { value: 8, label: 'Agosto' },
+    { value: 9, label: 'Setembro' },
+    { value: 10, label: 'Outubro' },
+    { value: 11, label: 'Novembro' },
+    { value: 12, label: 'Dezembro' },
   ];
 
-  years = [2024, 2025, 2026, 2027, 2028];
+  yearOptions: SelectOption[] = [
+    { value: 2024, label: '2024' },
+    { value: 2025, label: '2025' },
+    { value: 2026, label: '2026' },
+    { value: 2027, label: '2027' },
+    { value: 2028, label: '2028' },
+  ];
 
   isAccountModalOpen = signal(false);
   editingAccount = signal<Account | null>(null);
@@ -728,10 +734,95 @@ export class DashboardComponent implements OnInit {
     color: ['#FFFFFF'],
   });
 
+  chartOptions: any = {
+    chart: {
+      type: 'bar',
+      height: 240,
+      toolbar: { show: false },
+      background: 'transparent',
+      fontFamily: 'inherit',
+      animations: {
+        enabled: true,
+        easing: 'easeinout',
+        speed: 500,
+      },
+    },
+    plotOptions: {
+      bar: {
+        horizontal: false,
+        columnWidth: '36%',
+        borderRadius: 5,
+        borderRadiusApplication: 'end',
+      },
+    },
+    dataLabels: {
+      enabled: false,
+    },
+    stroke: {
+      show: true,
+      width: 2,
+      colors: ['transparent'],
+    },
+    colors: ['#10B981', '#A1A1AA'],
+    xaxis: {
+      categories: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+      axisBorder: { show: false },
+      axisTicks: { show: false },
+      labels: {
+        style: {
+          colors: '#71717A',
+          fontSize: '11px',
+          fontFamily: 'monospace',
+        },
+      },
+    },
+    yaxis: {
+      labels: {
+        style: {
+          colors: '#71717A',
+          fontSize: '10px',
+          fontFamily: 'monospace',
+        },
+        formatter: (val: number) => 'R$ ' + (val >= 1000 ? (val / 1000).toFixed(1) + 'k' : val.toFixed(0)),
+      },
+    },
+    grid: {
+      borderColor: '#27272A',
+      strokeDashArray: 4,
+      yaxis: {
+        lines: { show: true },
+      },
+    },
+    tooltip: {
+      theme: 'dark',
+      y: {
+        formatter: (val: number) => 'R$ ' + val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+      },
+    },
+    legend: {
+      position: 'bottom',
+      labels: {
+        colors: '#A1A1AA',
+      },
+      markers: {
+        radius: 4,
+      },
+    },
+  };
+
+  chartSeries: any[] = [
+    { name: 'Receitas', data: [] },
+    { name: 'Despesas + Faturas', data: [] },
+  ];
+
   constructor() {
     effect(() => {
       const scope = this.familyService.activeScope();
-      this.dashboardService.getSummary(this.selectedMonth, this.selectedYear, scope).subscribe();
+      this.dashboardService.getSummary(this.selectedMonth, this.selectedYear, scope).subscribe((res) => {
+        if (res && res.cashFlowHistory) {
+          this.updateChart(res.cashFlowHistory);
+        }
+      });
     });
   }
 
@@ -739,9 +830,42 @@ export class DashboardComponent implements OnInit {
     this.changePeriod();
   }
 
+  onMonthChange(month: number) {
+    this.selectedMonth = month;
+    this.changePeriod();
+  }
+
+  onYearChange(year: number) {
+    this.selectedYear = year;
+    this.changePeriod();
+  }
+
   changePeriod() {
     const scope = this.familyService.activeScope();
-    this.dashboardService.getSummary(this.selectedMonth, this.selectedYear, scope).subscribe();
+    this.dashboardService.getSummary(this.selectedMonth, this.selectedYear, scope).subscribe((res) => {
+      if (res && res.cashFlowHistory) {
+        this.updateChart(res.cashFlowHistory);
+      }
+    });
+  }
+
+  updateChart(history: CashFlowPoint[]) {
+    if (!history || history.length === 0) return;
+    const categories = history.map((h) => h.monthLabel);
+    const incomeData = history.map((h) => h.income);
+    const expenseData = history.map((h) => h.expense + h.invoice);
+
+    this.chartOptions = {
+      ...this.chartOptions,
+      xaxis: {
+        ...this.chartOptions.xaxis,
+        categories,
+      },
+    };
+    this.chartSeries = [
+      { name: 'Receitas', data: incomeData },
+      { name: 'Despesas + Faturas', data: expenseData },
+    ];
   }
 
   getBarHeight(value: number, history: CashFlowPoint[]): number {

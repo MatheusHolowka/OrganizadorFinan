@@ -38,6 +38,16 @@ export const routes: Routes = [
     loadComponent: () => import('./features/cards/cards.component').then((m) => m.CardsComponent),
   },
   {
+    path: 'investments',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/investments/investments.component').then((m) => m.InvestmentsComponent),
+  },
+  {
+    path: 'loans',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/loans/loans.component').then((m) => m.LoansComponent),
+  },
+  {
     path: 'vaults',
     canActivate: [authGuard],
     loadComponent: () => import('./features/vaults/vaults.component').then((m) => m.VaultsComponent),
@@ -46,6 +56,11 @@ export const routes: Routes = [
     path: 'import',
     canActivate: [authGuard],
     loadComponent: () => import('./features/import/import.component').then((m) => m.ImportComponent),
+  },
+  {
+    path: 'open-finance',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/open-finance/open-finance.component').then((m) => m.OpenFinanceComponent),
   },
   {
     path: 'profile',

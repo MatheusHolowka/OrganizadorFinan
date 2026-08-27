@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { ImportService } from '../../core/services/import.service';
 import { AccountsService } from '../../core/services/accounts.service';
@@ -19,6 +19,7 @@ import { Account, Category, ImportBatchPreview, ImportItem } from '../../core/mo
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     CurrencyBrlPipe,
     HeaderComponent,
     SidebarComponent,
@@ -45,11 +46,39 @@ import { Account, Category, ImportBatchPreview, ImportItem } from '../../core/mo
                 Upload de arquivos <strong>.OFX</strong> ou <strong>.CSV</strong> bancários com neutralização de duplicatas
               </p>
             </div>
+
+            <div>
+              <a
+                routerLink="/open-finance"
+                class="px-3.5 py-2 rounded-xl bg-emerald-950/40 hover:bg-emerald-950/70 text-emerald-400 border border-emerald-900/60 text-xs font-medium transition-all inline-flex items-center gap-1.5"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Conectar via Open Finance</span>
+              </a>
+            </div>
           </div>
 
           <!-- Card de Upload e Configuração -->
           @if (!preview()) {
             <div class="max-w-xl mx-auto space-y-5">
+              <!-- Banner Sugestão Open Finance -->
+              <div class="p-4 rounded-2xl bg-[#0c0c0e] border border-neutral-800 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-sm">
+                    🏦
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold text-white">Prefere sincronização automática?</h4>
+                    <p class="text-[11px] text-neutral-400">Conecte seus bancos diretamente sem precisar exportar arquivos.</p>
+                  </div>
+                </div>
+                <a
+                  routerLink="/open-finance"
+                  class="px-3 py-1.5 rounded-lg bg-neutral-900 hover:bg-neutral-800 text-white text-xs font-medium border border-neutral-800 transition-all shrink-0"
+                >
+                  Abrir Open Finance
+                </a>
+              </div>
               <div class="p-6 rounded-2xl bg-[#0c0c0e] border border-neutral-800 space-y-4">
                 <div>
                   <label class="block text-[11px] font-mono text-neutral-400 uppercase mb-1.5">

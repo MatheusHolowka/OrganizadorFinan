@@ -21,6 +21,11 @@ export class CreditCardsController {
     return this.creditCardsService.findOne(userId, id);
   }
 
+  @Post(':id/toggle-archive')
+  async toggleArchive(@CurrentUser('id') userId: string, @Param('id') id: string) {
+    return this.creditCardsService.toggleArchive(userId, id);
+  }
+
   @Post()
   async create(@CurrentUser('id') userId: string, @Body() dto: CreateCardDto) {
     return this.creditCardsService.create(userId, dto);

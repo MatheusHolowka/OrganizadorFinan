@@ -78,6 +78,8 @@ export interface CreditCard {
   lastDigits?: string;
   paymentAccountId?: string;
   paymentAccount?: Account;
+  isArchived?: boolean;
+  status?: string;
   currentInvoice?: CreditCardInvoice;
   invoices?: CreditCardInvoice[];
 }
@@ -217,6 +219,9 @@ export interface DashboardSummary {
     totalCardLimit: number;
     totalCardUsed: number;
     totalCardAvailable: number;
+    totalInvestments?: number;
+    totalLoans?: number;
+    netWorth?: number;
   };
   accounts: Account[];
   cards: DashboardCardItem[];
@@ -225,4 +230,62 @@ export interface DashboardSummary {
   vaults: Vault[];
   recentTransactions: Transaction[];
   scope?: 'personal' | 'family';
+}
+
+export interface OpenFinanceInvestment {
+  id: string;
+  openFinanceConnectionId: string;
+  pluggyInvestmentId?: string;
+  name: string;
+  code?: string;
+  isin?: string;
+  type?: string;
+  subtype?: string;
+  balance: number;
+  amount: number;
+  currencyCode?: string;
+  rate?: number;
+  rateType?: string;
+  fixedAnnualRate?: number;
+  dueDate?: string;
+  issuer?: string;
+  status?: string;
+}
+
+export interface OpenFinanceLoan {
+  id: string;
+  openFinanceConnectionId: string;
+  pluggyLoanId?: string;
+  contractNumber?: string;
+  productName?: string;
+  type?: string;
+  contractAmount: number;
+  outstandingBalance: number;
+  currencyCode?: string;
+  dueDate?: string;
+  totalInstallments?: number;
+  paidInstallments?: number;
+  dueInstallments?: number;
+  cet?: number;
+  interestRate?: number;
+}
+
+export interface OpenFinanceConnection {
+  id: string;
+  userId: string;
+  itemId: string;
+  connectorId: number;
+  connectorName: string;
+  connectorColor?: string;
+  connectorImageUrl?: string;
+  status: string;
+  executionStatus?: string;
+  errorCode?: string;
+  lastUpdatedAt?: string;
+  consentExpiresAt?: string;
+  createdAt: string;
+  accounts?: Account[];
+  creditCards?: CreditCard[];
+  investments?: OpenFinanceInvestment[];
+  loans?: OpenFinanceLoan[];
 }

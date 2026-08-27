@@ -10,9 +10,9 @@ import { randomUUID } from 'crypto';
 export class CreditCardsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(userId: string) {
+  async findAll(userId: string, includeArchived = true) {
     const cards = await this.prisma.creditCard.findMany({
-      where: { userId, isArchived: false },
+      where: includeArchived ? { userId } : { userId, isArchived: false },
       include: {
         paymentAccount: true,
         invoices: {
@@ -35,30 +35,82 @@ export class CreditCardsService {
           where: {
             creditCardId: card.id,
             status: { in: [InvoiceStatus.OPEN, InvoiceStatus.CLOSED] },
+            OR: [
+              { referenceYear: currentYear, referenceMonth: currentMonth },
+              { referenceYear: currentYear, referenceMonth: currentMonth + 1 },
+              { referenceYear: { gt: currentYear } },
+            ],
           },
         });
 
         const totalUsed = openInvoices.reduce(
-          (sum, inv) => sum + (Number(inv.totalAmount) - Number(inv.paidAmount)),
+          (sum, inv) => sum + Math.max(0, Number(inv.totalAmount) - Number(inv.paidAmount)),
           0,
         );
 
         const limit = Number(card.limit);
         const availableLimit = Math.max(0, limit - totalUsed);
 
+        const currentInvoiceUnpaid = Math.max(0, Number(currentInvoice.totalAmount) - Number(currentInvoice.paidAmount));
+
         return {
           ...card,
           limit,
           availableLimit,
-          currentInvoiceAmount: Number(currentInvoice.totalAmount) - Number(currentInvoice.paidAmount),
+          currentInvoiceAmount: currentInvoiceUnpaid,
           currentInvoice,
         };
       }),
     );
   }
 
+  async toggleArchive(userId: string, id: string) {
+    const card = await this.prisma.creditCard.findFirst({
+      where: { id, userId },
+    });
+    if (!card) {
+      throw new NotFoundException('Cartão de crédito não encontrado');
+    }
+
+    const updated = await this.prisma.creditCard.update({
+      where: { id },
+      data: { isArchived: !card.isArchived },
+    });
+
+    return {
+      message: updated.isArchived ? 'Cartão marcado como Cancelado/Inativo!' : 'Cartão reativado com sucesso!',
+      card: updated,
+    };
+  }
+
   async findOne(userId: string, id: string) {
     const card = await this.prisma.creditCard.findFirst({
+      where: { id, userId },
+      include: {
+        paymentAccount: true,
+      },
+    });
+
+    if (!card) {
+      throw new NotFoundException('Cartão de crédito não encontrado');
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = now.getFullYear();
+    const currentDay = now.getDate();
+
+    // Garante que a fatura do mês atual exista
+    await this.getOrCreateInvoice(card.id, currentMonth, currentYear, card.closingDay, card.dueDay);
+
+    // Se o dia atual já passou ou alcançou o fechamento (corte), garante também a fatura do ciclo aberto seguinte
+    if (currentDay >= card.closingDay) {
+      const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+      const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+      await this.getOrCreateInvoice(card.id, nextMonth, nextYear, card.closingDay, card.dueDay);
+    }
+
+    const fullCard = await this.prisma.creditCard.findFirst({
       where: { id, userId },
       include: {
         paymentAccount: true,
@@ -74,11 +126,7 @@ export class CreditCardsService {
       },
     });
 
-    if (!card) {
-      throw new NotFoundException('Cartão de crédito não encontrado');
-    }
-
-    return card;
+    return fullCard;
   }
 
   async create(userId: string, dto: CreateCardDto) {

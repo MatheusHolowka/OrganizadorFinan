@@ -44,6 +44,28 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
         </a>
 
         <a
+          routerLink="/investments"
+          routerLinkActive="bg-white/10 text-white border-neutral-700 shadow-sm"
+          class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all font-medium text-sm border border-transparent"
+        >
+          <svg class="w-4 h-4 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+          </svg>
+          <span>Investimentos</span>
+        </a>
+
+        <a
+          routerLink="/loans"
+          routerLinkActive="bg-white/10 text-white border-neutral-700 shadow-sm"
+          class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all font-medium text-sm border border-transparent"
+        >
+          <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span>Empréstimos</span>
+        </a>
+
+        <a
           routerLink="/vaults"
           routerLinkActive="bg-white/10 text-white border-neutral-700 shadow-sm"
           class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all font-medium text-sm border border-transparent"
@@ -63,6 +85,22 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
           <span>Importar OFX/CSV</span>
+        </a>
+
+        <a
+          routerLink="/open-finance"
+          routerLinkActive="bg-white/10 text-white border-neutral-700 shadow-sm"
+          class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-neutral-400 hover:text-white hover:bg-neutral-900 transition-all font-medium text-sm border border-transparent"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+          </svg>
+          <div class="flex items-center justify-between flex-1">
+            <span>Open Finance</span>
+            <span class="px-1.5 py-0.2 rounded bg-emerald-950 text-emerald-400 border border-emerald-800/60 text-[9px] font-mono">
+              PLUGGY
+            </span>
+          </div>
         </a>
 
         <a

@@ -1,4 +1,4 @@
-import { Component, OnInit, effect, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -13,6 +13,7 @@ import { HeaderComponent } from '../../shared/components/header/header.component
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { BottomNavComponent } from '../../shared/components/bottom-nav/bottom-nav.component';
 import { ModalComponent } from '../../shared/components/modal/modal.component';
+import { CustomSelectComponent, SelectOption } from '../../shared/components/custom-select/custom-select.component';
 import { Account, Category } from '../../core/models';
 
 @Component({
@@ -28,6 +29,7 @@ import { Account, Category } from '../../core/models';
     SidebarComponent,
     BottomNavComponent,
     ModalComponent,
+    CustomSelectComponent,
   ],
   template: `
     <div class="h-screen flex flex-col overflow-hidden bg-black text-[#ededed] font-sans">
@@ -81,68 +83,34 @@ import { Account, Category } from '../../core/models';
 
           <!-- Barra de Filtros -->
           <div class="p-4 rounded-2xl bg-[#0c0c0e] border border-neutral-800 flex flex-wrap items-center gap-3">
-            <!-- Seletor de Mês -->
+            <!-- Seletor de Mês Custom Dark -->
             <div class="flex items-center gap-2">
               <span class="text-[11px] font-mono text-neutral-400 uppercase">Mês:</span>
-              <div class="relative">
-                <select
-                  [(ngModel)]="selectedMonth"
-                  (change)="applyFilters()"
-                  class="appearance-none pl-3 pr-7 py-1.5 rounded-lg bg-black border border-neutral-800 text-white text-xs font-medium focus:outline-none focus:border-neutral-600 cursor-pointer"
-                >
-                  @for (m of months; track m.value) {
-                    <option [value]="m.value" class="bg-neutral-900 text-white">{{ m.name }}</option>
-                  }
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-500">
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
+              <app-custom-select
+                [options]="monthOptions"
+                [value]="selectedMonth"
+                (valueChange)="onMonthFilterChange($event)"
+              ></app-custom-select>
             </div>
 
-            <!-- Seletor de Ano -->
+            <!-- Seletor de Ano Custom Dark -->
             <div class="flex items-center gap-2">
               <span class="text-[11px] font-mono text-neutral-400 uppercase">Ano:</span>
-              <div class="relative">
-                <select
-                  [(ngModel)]="selectedYear"
-                  (change)="applyFilters()"
-                  class="appearance-none pl-3 pr-7 py-1.5 rounded-lg bg-black border border-neutral-800 text-white text-xs font-mono font-medium focus:outline-none focus:border-neutral-600 cursor-pointer"
-                >
-                  @for (y of years; track y) {
-                    <option [value]="y" class="bg-neutral-900 text-white">{{ y }}</option>
-                  }
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-500">
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
+              <app-custom-select
+                [options]="yearOptions"
+                [value]="selectedYear"
+                (valueChange)="onYearFilterChange($event)"
+              ></app-custom-select>
             </div>
 
-            <!-- Seletor de Tipo -->
+            <!-- Seletor de Tipo Custom Dark -->
             <div class="flex items-center gap-2">
               <span class="text-[11px] font-mono text-neutral-400 uppercase">Tipo:</span>
-              <div class="relative">
-                <select
-                  [(ngModel)]="selectedType"
-                  (change)="applyFilters()"
-                  class="appearance-none pl-3 pr-7 py-1.5 rounded-lg bg-black border border-neutral-800 text-white text-xs font-medium focus:outline-none focus:border-neutral-600 cursor-pointer"
-                >
-                  <option value="" class="bg-neutral-900 text-white">Todos os Tipos</option>
-                  <option value="INCOME" class="bg-neutral-900 text-emerald-400">Receitas (+)</option>
-                  <option value="EXPENSE" class="bg-neutral-900 text-rose-400">Despesas (-)</option>
-                  <option value="TRANSFER" class="bg-neutral-900 text-neutral-300">Transferências (↔)</option>
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-neutral-500">
-                  <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
+              <app-custom-select
+                [options]="typeOptions"
+                [value]="selectedType"
+                (valueChange)="onTypeFilterChange($event)"
+              ></app-custom-select>
             </div>
 
             <!-- Campo de Busca -->
@@ -218,7 +186,7 @@ import { Account, Category } from '../../core/models';
                       </tr>
                     </thead>
                     <tbody class="divide-y divide-neutral-850 text-neutral-300">
-                      @for (tx of data.transactions; track tx.id) {
+                      @for (tx of paginatedTransactions(); track tx.id) {
                         <tr class="hover:bg-neutral-900/40 transition-colors">
                           <td class="py-3.5 text-neutral-500">{{ tx.date | date:'dd/MM/yyyy' }}</td>
                           <td class="py-3.5 font-sans font-medium text-white flex items-center gap-2">
@@ -261,6 +229,45 @@ import { Account, Category } from '../../core/models';
                     </tbody>
                   </table>
                 </div>
+
+                <!-- Controles de Paginação (10 em 10) -->
+                @if (totalItems() > 0) {
+                  <div class="mt-4 pt-4 border-t border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-mono">
+                    <div class="text-neutral-500">
+                      Mostrando <span class="text-white font-bold">{{ startIndex() + 1 }}</span> a
+                      <span class="text-white font-bold">{{ endIndex() }}</span> de
+                      <span class="text-white font-bold">{{ totalItems() }}</span> lançamentos
+                    </div>
+
+                    <div class="flex items-center gap-1.5 self-end sm:self-auto">
+                      <button
+                        (click)="prevPage()"
+                        [disabled]="currentPage() === 1"
+                        class="px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                      >
+                        ← Anterior
+                      </button>
+
+                      @for (p of pagesArray(); track p) {
+                        <button
+                          (click)="goToPage(p)"
+                          [ngClass]="currentPage() === p ? 'bg-white text-black font-bold border-white' : 'bg-neutral-900 text-neutral-400 hover:text-white border-neutral-800'"
+                          class="w-7 h-7 rounded-lg border text-xs flex items-center justify-center transition-all cursor-pointer"
+                        >
+                          {{ p }}
+                        </button>
+                      }
+
+                      <button
+                        (click)="nextPage()"
+                        [disabled]="currentPage() === totalPages()"
+                        class="px-2.5 py-1.5 rounded-lg bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white hover:bg-neutral-800 disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+                      >
+                        Próxima →
+                      </button>
+                    </div>
+                  </div>
+                }
               }
             </div>
           }
@@ -441,22 +448,51 @@ export class TransactionsComponent implements OnInit {
   selectedType = '';
   searchQuery = '';
 
-  months = [
-    { value: 1, name: 'Janeiro' },
-    { value: 2, name: 'Fevereiro' },
-    { value: 3, name: 'Março' },
-    { value: 4, name: 'Abril' },
-    { value: 5, name: 'Maio' },
-    { value: 6, name: 'Junho' },
-    { value: 7, name: 'Julho' },
-    { value: 8, name: 'Agosto' },
-    { value: 9, name: 'Setembro' },
-    { value: 10, name: 'Outubro' },
-    { value: 11, name: 'Novembro' },
-    { value: 12, name: 'Dezembro' },
+  monthOptions: SelectOption[] = [
+    { value: 1, label: 'Janeiro' },
+    { value: 2, label: 'Fevereiro' },
+    { value: 3, label: 'Março' },
+    { value: 4, label: 'Abril' },
+    { value: 5, label: 'Maio' },
+    { value: 6, label: 'Junho' },
+    { value: 7, label: 'Julho' },
+    { value: 8, label: 'Agosto' },
+    { value: 9, label: 'Setembro' },
+    { value: 10, label: 'Outubro' },
+    { value: 11, label: 'Novembro' },
+    { value: 12, label: 'Dezembro' },
   ];
 
-  years = [2027, 2026, 2025, 2024, 2023, 2022, 2021, 2020];
+  yearOptions: SelectOption[] = [
+    { value: 2028, label: '2028' },
+    { value: 2027, label: '2027' },
+    { value: 2026, label: '2026' },
+    { value: 2025, label: '2025' },
+    { value: 2024, label: '2024' },
+    { value: 2023, label: '2023' },
+  ];
+
+  typeOptions: SelectOption[] = [
+    { value: '', label: 'Todos os Tipos' },
+    { value: 'INCOME', label: 'Receitas (+)', color: '#10B981' },
+    { value: 'EXPENSE', label: 'Despesas (-)', color: '#F43F5E' },
+    { value: 'TRANSFER', label: 'Transferências (↔)', color: '#A1A1AA' },
+  ];
+
+  onMonthFilterChange(month: number) {
+    this.selectedMonth = month;
+    this.applyFilters();
+  }
+
+  onYearFilterChange(year: number) {
+    this.selectedYear = year;
+    this.applyFilters();
+  }
+
+  onTypeFilterChange(type: string) {
+    this.selectedType = type;
+    this.applyFilters();
+  }
 
   constructor() {
     effect(() => {
@@ -466,7 +502,7 @@ export class TransactionsComponent implements OnInit {
   }
 
   get selectedMonthName(): string {
-    return this.months.find((m) => m.value === Number(this.selectedMonth))?.name || '';
+    return this.monthOptions.find((m) => m.value === Number(this.selectedMonth))?.label || '';
   }
 
   form = this.fb.group({
@@ -490,7 +526,56 @@ export class TransactionsComponent implements OnInit {
     this.categoriesService.findAll().subscribe((cats) => this.categories.set(cats));
   }
 
+  pageSize = 10;
+  currentPage = signal<number>(1);
+
+  totalItems = computed(() => this.transactionsService.data()?.transactions.length || 0);
+  totalPages = computed(() => Math.max(1, Math.ceil(this.totalItems() / this.pageSize)));
+  startIndex = computed(() => (this.currentPage() - 1) * this.pageSize);
+  endIndex = computed(() => Math.min(this.startIndex() + this.pageSize, this.totalItems()));
+
+  paginatedTransactions = computed(() => {
+    const list = this.transactionsService.data()?.transactions || [];
+    const start = this.startIndex();
+    return list.slice(start, start + this.pageSize);
+  });
+
+  pagesArray = computed(() => {
+    const total = this.totalPages();
+    const current = this.currentPage();
+    const pages: number[] = [];
+    const maxButtons = 5;
+    let start = Math.max(1, current - 2);
+    let end = Math.min(total, start + maxButtons - 1);
+    if (end - start < maxButtons - 1) {
+      start = Math.max(1, end - maxButtons + 1);
+    }
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    return pages;
+  });
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages()) {
+      this.currentPage.set(page);
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage() < this.totalPages()) {
+      this.currentPage.update((p) => p + 1);
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage() > 1) {
+      this.currentPage.update((p) => p - 1);
+    }
+  }
+
   loadData(scope?: string) {
+    this.currentPage.set(1);
     const currentScope = scope || this.familyService.activeScope();
     this.transactionsService
       .findAll({
@@ -504,6 +589,7 @@ export class TransactionsComponent implements OnInit {
   }
 
   applyFilters() {
+    this.currentPage.set(1);
     this.loadData();
   }
 

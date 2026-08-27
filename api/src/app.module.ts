@@ -14,6 +14,9 @@ import { CreditCardsModule } from './credit-cards/credit-cards.module';
 import { VaultsModule } from './vaults/vaults.module';
 import { ImportModule } from './import/import.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { OpenFinanceModule } from './open-finance/open-finance.module';
+import { InvestmentsModule } from './investments/investments.module';
+import { LoansModule } from './loans/loans.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -44,6 +47,9 @@ import { AppService } from './app.service';
     VaultsModule,
     ImportModule,
     DashboardModule,
+    OpenFinanceModule,
+    InvestmentsModule,
+    LoansModule,
   ],
   controllers: [AppController],
   providers: [

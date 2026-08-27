@@ -21,8 +21,11 @@
     "@angular/router": "^21.2.0",
     "@angular/ssr": "^21.2.21",
     "@lucide/angular": "^1.34.0",
+    "apexcharts": "^7.0.0",
     "express": "^5.1.0",
     "lucide-angular": "^1.0.0",
+    "ng-apexcharts": "^3.1.0",
+    "pluggy-connect-sdk": "^2.14.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },

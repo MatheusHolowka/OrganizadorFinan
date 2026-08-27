@@ -131,6 +131,7 @@ model User {
   importBatches       ImportBatch[]
   createdFamilyGroups FamilyGroup[]  @relation("FamilyGroupCreator")
   familyMemberships   FamilyMember[]
+  openFinanceConnections OpenFinanceConnection[]
 
   @@map("users")
 }
@@ -145,17 +146,21 @@ model Account {
   color          String?     @default("#10B981")
   icon           String?     @default("wallet")
   isArchived     Boolean     @default(false) @map("is_archived")
+  openFinanceConnectionId String? @map("open_finance_connection_id")
+  pluggyAccountId         String? @unique @map("pluggy_account_id")
   createdAt      DateTime    @default(now()) @map("created_at")
   updatedAt      DateTime    @updatedAt @map("updated_at")
 
-  user              User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  transactions      Transaction[]      @relation("AccountTransactions")
-  transfersReceived Transaction[]      @relation("TransferDestinationAccount")
-  creditCards       CreditCard[]       @relation("CardPaymentAccount")
-  vaultTransactions VaultTransaction[]
-  importBatches     ImportBatch[]
+  user                  User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  openFinanceConnection OpenFinanceConnection? @relation(fields: [openFinanceConnectionId], references: [id], onDelete: SetNull)
+  transactions          Transaction[]          @relation("AccountTransactions")
+  transfersReceived     Transaction[]          @relation("TransferDestinationAccount")
+  creditCards           CreditCard[]           @relation("CardPaymentAccount")
+  vaultTransactions     VaultTransaction[]
+  importBatches         ImportBatch[]
 
   @@index([userId])
+  @@index([openFinanceConnectionId])
   @@map("accounts")
 }
 
@@ -201,6 +206,7 @@ model Transaction {
   isReconciled         Boolean           @default(false) @map("is_reconciled")
   importItemId         String?           @unique @map("import_item_id")
   vaultTransactionId   String?           @unique @map("vault_transaction_id")
+  pluggyTransactionId  String?           @unique @map("pluggy_transaction_id")
   createdAt            DateTime          @default(now()) @map("created_at")
   updatedAt            DateTime          @updatedAt @map("updated_at")
 
@@ -233,15 +239,19 @@ model CreditCard {
   color            String?   @default("#6366F1")
   lastDigits       String?   @map("last_digits") @db.VarChar(4)
   isArchived       Boolean   @default(false) @map("is_archived")
+  openFinanceConnectionId String? @map("open_finance_connection_id")
+  pluggyCreditCardId      String? @unique @map("pluggy_credit_card_id")
   createdAt        DateTime  @default(now()) @map("created_at")
   updatedAt        DateTime  @updatedAt @map("updated_at")
 
-  user           User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  paymentAccount Account?                @relation("CardPaymentAccount", fields: [paymentAccountId], references: [id], onDelete: SetNull)
-  invoices       CreditCardInvoice[]
-  transactions   CreditCardTransaction[]
+  user                  User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  openFinanceConnection OpenFinanceConnection?  @relation(fields: [openFinanceConnectionId], references: [id], onDelete: SetNull)
+  paymentAccount        Account?                @relation("CardPaymentAccount", fields: [paymentAccountId], references: [id], onDelete: SetNull)
+  invoices              CreditCardInvoice[]
+  transactions          CreditCardTransaction[]
 
   @@index([userId])
+  @@index([openFinanceConnectionId])
   @@map("credit_cards")
 }
 
@@ -428,3 +438,86 @@ model FamilyMember {
   @@index([email])
   @@map("family_members")
 }
+
+// ------------------------------------------------------
+// OPEN FINANCE (PLUGGY INTEGRATION)
+// ------------------------------------------------------
+
+model OpenFinanceConnection {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  itemId            String    @unique @map("item_id")
+  connectorId       Int       @map("connector_id")
+  connectorName     String    @map("connector_name")
+  connectorColor    String?   @map("connector_color")
+  connectorImageUrl String?   @map("connector_image_url")
+  status            String    @default("UPDATING")
+  executionStatus   String?   @map("execution_status")
+  errorCode         String?   @map("error_code")
+  lastUpdatedAt     DateTime? @map("last_updated_at")
+  consentExpiresAt  DateTime? @map("consent_expires_at")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accounts    Account[]
+  creditCards CreditCard[]
+  investments OpenFinanceInvestment[]
+  loans       OpenFinanceLoan[]
+
+  @@index([userId])
+  @@map("open_finance_connections")
+}
+
+model OpenFinanceInvestment {
+  id                      String    @id @default(uuid())
+  openFinanceConnectionId String    @map("open_finance_connection_id")
+  pluggyInvestmentId      String?   @unique @map("pluggy_investment_id")
+  name                    String
+  code                    String?
+  isin                    String?
+  type                    String?
+  subtype                 String?
+  balance                 Decimal   @default(0) @db.Decimal(12, 2)
+  amount                  Decimal   @default(0) @db.Decimal(12, 2)
+  currencyCode            String?   @default("BRL") @map("currency_code")
+  rate                    Decimal?  @db.Decimal(8, 4)
+  rateType                String?   @map("rate_type")
+  fixedAnnualRate         Decimal?  @map("fixed_annual_rate") @db.Decimal(8, 4)
+  dueDate                 DateTime? @map("due_date")
+  issuer                  String?
+  status                  String?   @default("ACTIVE")
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  openFinanceConnection   OpenFinanceConnection @relation(fields: [openFinanceConnectionId], references: [id], onDelete: Cascade)
+
+  @@index([openFinanceConnectionId])
+  @@map("open_finance_investments")
+}
+
+model OpenFinanceLoan {
+  id                      String    @id @default(uuid())
+  openFinanceConnectionId String    @map("open_finance_connection_id")
+  pluggyLoanId            String?   @unique @map("pluggy_loan_id")
+  contractNumber          String?   @map("contract_number")
+  productName             String?   @map("product_name")
+  type                    String?
+  contractAmount          Decimal   @default(0) @map("contract_amount") @db.Decimal(12, 2)
+  outstandingBalance      Decimal   @default(0) @map("outstanding_balance") @db.Decimal(12, 2)
+  currencyCode            String?   @default("BRL") @map("currency_code")
+  dueDate                 DateTime? @map("due_date")
+  totalInstallments       Int?      @map("total_installments")
+  paidInstallments        Int?      @map("paid_installments")
+  dueInstallments         Int?      @map("due_installments")
+  cet                     Decimal?  @map("cet") @db.Decimal(8, 4)
+  interestRate            Decimal?  @map("interest_rate") @db.Decimal(8, 4)
+  createdAt               DateTime  @default(now()) @map("created_at")
+  updatedAt               DateTime  @updatedAt @map("updated_at")
+
+  openFinanceConnection   OpenFinanceConnection @relation(fields: [openFinanceConnectionId], references: [id], onDelete: Cascade)
+
+  @@index([openFinanceConnectionId])
+  @@map("open_finance_loans")
+}
+

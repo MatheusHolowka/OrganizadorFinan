@@ -150,11 +150,16 @@ export class DashboardService {
           where: {
             creditCardId: c.id,
             status: { in: [InvoiceStatus.OPEN, InvoiceStatus.CLOSED] },
+            OR: [
+              { referenceYear: year, referenceMonth: month },
+              { referenceYear: year, referenceMonth: month + 1 },
+              { referenceYear: { gt: year } },
+            ],
           },
         });
 
         const cardUsed = openInvoices.reduce(
-          (sum, inv) => sum + (Number(inv.totalAmount) - Number(inv.paidAmount)),
+          (sum, inv) => sum + Math.max(0, Number(inv.totalAmount) - Number(inv.paidAmount)),
           0,
         );
 
@@ -239,7 +244,19 @@ export class DashboardService {
       });
     }
 
-    // 7. Últimas Transações
+    // 7. Investimentos e Empréstimos (Open Finance / Carteira)
+    const investments = await this.prisma.openFinanceInvestment.findMany({
+      where: { openFinanceConnection: { userId: userFilter } },
+    });
+    const totalInvestments = investments.reduce((sum, inv) => sum + Number(inv.balance), 0);
+
+    const loans = await this.prisma.openFinanceLoan.findMany({
+      where: { openFinanceConnection: { userId: userFilter } },
+    });
+    const totalLoans = loans.reduce((sum, l) => sum + Number(l.outstandingBalance), 0);
+    const netWorth = totalRawBalance + totalInvestments - totalOpenInvoices - totalLoans;
+
+    // 8. Últimas Transações
     const recentTransactions = await this.prisma.transaction.findMany({
       where: { userId: userFilter },
       take: 6,
@@ -263,6 +280,9 @@ export class DashboardService {
         totalCardLimit,
         totalCardUsed,
         totalCardAvailable,
+        totalInvestments,
+        totalLoans,
+        netWorth,
       },
       accounts,
       cards: formattedCards,

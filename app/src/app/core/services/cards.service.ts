@@ -42,6 +42,10 @@ export class CardsService {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
+  toggleArchive(id: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${id}/toggle-archive`, {});
+  }
+
   createTransaction(cardId: string, data: { description: string; totalAmount: number; purchaseDate: string; installments?: number; categoryId?: string }): Observable<any> {
     return this.http.post(`${this.apiUrl}/${cardId}/transactions`, data);
   }
