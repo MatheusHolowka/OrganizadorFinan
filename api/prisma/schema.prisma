@@ -120,6 +120,9 @@ model User {
   isEmailVerified         Boolean   @default(false) @map("is_email_verified")
   emailVerificationToken  String?   @map("email_verification_token")
   emailVerificationExpires DateTime? @map("email_verification_expires")
+  whatsappPhone           String?   @map("whatsapp_phone")
+  whatsappConnected       Boolean   @default(false) @map("whatsapp_connected")
+  whatsappToken           String?   @map("whatsapp_token")
   createdAt               DateTime  @default(now()) @map("created_at")
   updatedAt               DateTime  @updatedAt @map("updated_at")
 
@@ -128,6 +131,7 @@ model User {
   transactions        Transaction[]
   creditCards         CreditCard[]
   vaults              Vault[]
+  subscriptions       Subscription[]
   importBatches       ImportBatch[]
   createdFamilyGroups FamilyGroup[]  @relation("FamilyGroupCreator")
   familyMemberships   FamilyMember[]
@@ -320,6 +324,9 @@ model Vault {
   color                    String?       @default("#8B5CF6")
   status                   VaultStatus   @default(IN_PROGRESS)
   isolatedFromDailyBalance Boolean       @default(true) @map("isolated_from_daily_balance")
+  roundUpEnabled           Boolean       @default(false) @map("round_up_enabled")
+  roundUpStep              Decimal       @default(5.00) @map("round_up_step") @db.Decimal(6, 2)
+  roundUpAccumulated       Decimal       @default(0.00) @map("round_up_accumulated") @db.Decimal(12, 2)
   createdAt                DateTime      @default(now()) @map("created_at")
   updatedAt                DateTime      @updatedAt @map("updated_at")
 
@@ -520,4 +527,33 @@ model OpenFinanceLoan {
   @@index([openFinanceConnectionId])
   @@map("open_finance_loans")
 }
+
+// ------------------------------------------------------
+// SUBSCRIPTIONS & RECURRING EXPENSES RADAR
+// ------------------------------------------------------
+
+model Subscription {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  name           String
+  merchantName   String    @map("merchant_name")
+  amount         Decimal   @db.Decimal(12, 2)
+  frequency      String    @default("MONTHLY") // MONTHLY, YEARLY, WEEKLY
+  category       String    @default("STREAMING") // STREAMING, SOFTWARE, HEALTH, UTILITIES, EDUCATION, OTHER
+  status         String    @default("ACTIVE") // ACTIVE, FLAGGED_GHOST, CANCELLED
+  icon           String?   @default("tv")
+  color          String?   @default("#E50914")
+  lastBilledAt   DateTime? @map("last_billed_at")
+  nextBillingAt  DateTime? @map("next_billing_at")
+  autoDetected   Boolean   @default(true) @map("auto_detected")
+  notes          String?   @db.Text
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("subscriptions")
+}
+
 

@@ -82,6 +82,81 @@ import { Account, Vault } from '../../core/models';
             }
           </div>
 
+          <!-- Trocadinho Automático / Round-up Box (Oinc Engine) -->
+          <div class="p-5 rounded-2xl bg-gradient-to-r from-neutral-950 via-[#0c0c0e] to-neutral-950 border border-neutral-800 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-800/80 pb-3">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400 text-sm font-bold">
+                  🐷
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-bold text-white">Trocadinho Automático (Round-up Inteligente)</h3>
+                    <span class="px-2 py-0.2 rounded-full text-[9px] font-mono" [ngClass]="roundUpStats()?.activeVault ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-neutral-900 text-neutral-500'">
+                      {{ roundUpStats()?.activeVault ? 'ATIVO' : 'DESATIVADO' }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-neutral-400 font-sans mt-0.5">
+                    Arredonda o valor das compras do dia a dia e destina o troco direto para acelerar seu cofre.
+                  </p>
+                </div>
+              </div>
+
+              @if (roundUpStats()?.stats; as st) {
+                <div class="flex items-center gap-4 font-mono text-xs text-right">
+                  <div>
+                    <div class="text-[10px] text-neutral-500 uppercase">Potencial Mensal</div>
+                    <div class="text-emerald-400 font-bold">{{ st.estimatedMonthly | currencyBrl }}/mês</div>
+                  </div>
+                  <div>
+                    <div class="text-[10px] text-neutral-500 uppercase">Aceleração</div>
+                    <div class="text-white font-bold">{{ st.acceleratedMonths > 0 ? '~' + st.acceleratedMonths + ' meses antes' : 'Instantânea' }}</div>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <!-- Round-up Controls -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs font-mono">
+              <div class="flex flex-wrap items-center gap-3">
+                <span class="text-neutral-400">Arredondar para o próximo:</span>
+                <div class="flex items-center gap-1 p-1 rounded-xl bg-black border border-neutral-800">
+                  @for (step of [1, 5, 10]; track step) {
+                    <button
+                      (click)="setRoundUpStep(step)"
+                      [ngClass]="selectedStep() === step ? 'bg-white text-black font-bold' : 'text-neutral-400 hover:text-white'"
+                      class="px-2.5 py-1 rounded-lg transition-all cursor-pointer"
+                    >
+                      R$ {{ step }},00
+                    </button>
+                  }
+                </div>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <span class="text-neutral-400">Destino:</span>
+                <select
+                  [(ngModel)]="selectedTargetVaultId"
+                  class="px-3 py-1.5 rounded-xl bg-black border border-neutral-800 text-white focus:outline-none focus:border-neutral-600"
+                >
+                  <option value="">Selecione um cofre...</option>
+                  @for (v of (vaultsService.data()?.vaults || []); track v.id) {
+                    <option [value]="v.id">{{ v.title }}</option>
+                  }
+                </select>
+
+                <button
+                  (click)="toggleRoundUp()"
+                  [disabled]="!selectedTargetVaultId"
+                  class="px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer disabled:opacity-40"
+                  [ngClass]="roundUpStats()?.activeVault?.id === selectedTargetVaultId ? 'bg-rose-950 text-rose-300 border border-rose-800' : 'btn-vercel-primary'"
+                >
+                  {{ roundUpStats()?.activeVault?.id === selectedTargetVaultId ? 'Desativar' : 'Ativar Neste Cofre' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Cards de Metas e Cofres -->
           @if (vaultsService.loading()) {
             <div class="flex items-center justify-center py-20">
@@ -393,6 +468,11 @@ export class VaultsComponent implements OnInit {
   creatingVault = signal(false);
   movingVault = signal(false);
 
+  // Round-up (Trocadinho Automático)
+  roundUpStats = signal<any>(null);
+  selectedStep = signal<number>(5);
+  selectedTargetVaultId = '';
+
   vaultForm = this.fb.group({
     title: ['', [Validators.required]],
     description: [''],
@@ -411,11 +491,52 @@ export class VaultsComponent implements OnInit {
 
   ngOnInit() {
     this.vaultsService.findAll().subscribe();
+    this.loadRoundUpStats();
     this.accountsService.findAll().subscribe((res) => {
       this.accounts.set(res.accounts);
       if (res.accounts.length > 0) {
         this.movementForm.patchValue({ accountId: res.accounts[0].id });
       }
+    });
+  }
+
+  loadRoundUpStats() {
+    this.vaultsService.getRoundUpStats().subscribe({
+      next: (res) => {
+        this.roundUpStats.set(res);
+        if (res.activeVault) {
+          this.selectedTargetVaultId = res.activeVault.id;
+          this.selectedStep.set(res.activeVault.step || 5);
+        }
+      },
+    });
+  }
+
+  setRoundUpStep(step: number) {
+    this.selectedStep.set(step);
+    if (this.selectedTargetVaultId && this.roundUpStats()?.activeVault?.id === this.selectedTargetVaultId) {
+      this.vaultsService.toggleRoundUp(this.selectedTargetVaultId, true, step).subscribe({
+        next: () => {
+          this.toastService.success(`Passo de arredondamento atualizado para R$ ${step},00`);
+          this.loadRoundUpStats();
+        },
+      });
+    }
+  }
+
+  toggleRoundUp() {
+    if (!this.selectedTargetVaultId) return;
+
+    const isActive = this.roundUpStats()?.activeVault?.id === this.selectedTargetVaultId;
+    const shouldEnable = !isActive;
+
+    this.vaultsService.toggleRoundUp(this.selectedTargetVaultId, shouldEnable, this.selectedStep()).subscribe({
+      next: () => {
+        this.toastService.success(shouldEnable ? 'Trocadinho Automático ATIVADO para este cofre!' : 'Trocadinho Automático DESATIVADO.');
+        this.loadRoundUpStats();
+        this.vaultsService.findAll().subscribe();
+      },
+      error: () => this.toastService.error('Erro ao atualizar trocadinho automático.'),
     });
   }
 

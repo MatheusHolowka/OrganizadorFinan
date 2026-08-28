@@ -48,4 +48,19 @@ export class VaultsController {
   async remove(@CurrentUser('id') userId: string, @Param('id') id: string) {
     return this.vaultsService.remove(userId, id);
   }
+
+  @Get('roundups/stats')
+  async getRoundUpStats(@CurrentUser('id') userId: string) {
+    return this.vaultsService.getRoundUpStats(userId);
+  }
+
+  @Patch(':id/roundup')
+  async toggleRoundUp(
+    @CurrentUser('id') userId: string,
+    @Param('id') id: string,
+    @Body() body: { enabled: boolean; step?: number },
+  ) {
+    return this.vaultsService.toggleRoundUp(userId, id, body.enabled, body.step || 5);
+  }
 }
+

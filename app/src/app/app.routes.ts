@@ -63,6 +63,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/open-finance/open-finance.component').then((m) => m.OpenFinanceComponent),
   },
   {
+    path: 'subscriptions',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/subscriptions/subscriptions.component').then((m) => m.SubscriptionsComponent),
+  },
+  {
     path: 'profile',
     canActivate: [authGuard],
     loadComponent: () => import('./features/profile/profile.component').then((m) => m.ProfileComponent),

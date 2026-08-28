@@ -238,4 +238,100 @@ export class VaultsService {
       where: { id },
     });
   }
+
+  // ------------------------------------------------------
+  // ROUND-UP (TROCADINHO AUTOMÁTICO - OINC ENGINE)
+  // ------------------------------------------------------
+
+  async toggleRoundUp(userId: string, vaultId: string, enabled: boolean, step: number = 5) {
+    const vault = await this.findOne(userId, vaultId);
+
+    // If enabling this vault, optionally disable others to have one primary round-up target
+    if (enabled) {
+      await this.prisma.vault.updateMany({
+        where: { userId, id: { not: vaultId } },
+        data: { roundUpEnabled: false },
+      });
+    }
+
+    return this.prisma.vault.update({
+      where: { id: vaultId },
+      data: {
+        roundUpEnabled: enabled,
+        roundUpStep: step,
+      },
+    });
+  }
+
+  async getRoundUpStats(userId: string) {
+    const activeRoundUpVault = await this.prisma.vault.findFirst({
+      where: { userId, roundUpEnabled: true },
+    });
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const [accountTx, cardTx] = await Promise.all([
+      this.prisma.transaction.findMany({
+        where: { userId, date: { gte: thirtyDaysAgo }, type: 'EXPENSE' },
+        select: { amount: true },
+      }),
+      this.prisma.creditCardTransaction.findMany({
+        where: { creditCard: { userId }, purchaseDate: { gte: thirtyDaysAgo } },
+        select: { totalAmount: true },
+      }),
+    ]);
+
+    const allExpenses = [
+      ...accountTx.map((t) => Number(t.amount)),
+      ...cardTx.map((t) => Number(t.totalAmount)),
+    ];
+
+    const step = activeRoundUpVault ? Number(activeRoundUpVault.roundUpStep) : 5;
+
+    let totalRoundUp30Days = 0;
+    let eligibleTxCount = 0;
+
+    for (const val of allExpenses) {
+      if (val > 0) {
+        const remainder = val % step;
+        const diff = remainder === 0 ? 0 : step - remainder;
+        if (diff > 0) {
+          totalRoundUp30Days += diff;
+          eligibleTxCount++;
+        }
+      }
+    }
+
+    const estimatedMonthly = Number(totalRoundUp30Days.toFixed(2));
+    const estimatedYearly = Number((estimatedMonthly * 12).toFixed(2));
+
+    let acceleratedMonths = 0;
+    if (activeRoundUpVault) {
+      const remainingTarget = Math.max(0, Number(activeRoundUpVault.targetAmount) - Number(activeRoundUpVault.currentAmount));
+      if (estimatedMonthly > 0 && remainingTarget > 0) {
+        // Shaves off months of pure waiting
+        acceleratedMonths = Number((remainingTarget / (estimatedMonthly + 200)).toFixed(1));
+      }
+    }
+
+    return {
+      activeVault: activeRoundUpVault
+        ? {
+            id: activeRoundUpVault.id,
+            title: activeRoundUpVault.title,
+            step,
+            accumulated: Number(activeRoundUpVault.roundUpAccumulated || 0),
+          }
+        : null,
+      stats: {
+        eligibleTxCount,
+        step,
+        estimatedMonthly,
+        estimatedYearly,
+        acceleratedMonths,
+      },
+    };
+  }
 }
+

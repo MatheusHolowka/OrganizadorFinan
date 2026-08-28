@@ -17,6 +17,8 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { OpenFinanceModule } from './open-finance/open-finance.module';
 import { InvestmentsModule } from './investments/investments.module';
 import { LoansModule } from './loans/loans.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { AssistantModule } from './assistant/assistant.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -50,6 +52,8 @@ import { AppService } from './app.service';
     OpenFinanceModule,
     InvestmentsModule,
     LoansModule,
+    SubscriptionsModule,
+    AssistantModule,
   ],
   controllers: [AppController],
   providers: [

@@ -59,4 +59,22 @@ export class VaultsService {
   remove(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
+
+  getRoundUpStats(): Observable<{
+    activeVault: { id: string; title: string; step: number; accumulated: number } | null;
+    stats: {
+      eligibleTxCount: number;
+      step: number;
+      estimatedMonthly: number;
+      estimatedYearly: number;
+      acceleratedMonths: number;
+    };
+  }> {
+    return this.http.get<any>(`${this.apiUrl}/roundups/stats`);
+  }
+
+  toggleRoundUp(vaultId: string, enabled: boolean, step: number = 5): Observable<Vault> {
+    return this.http.patch<Vault>(`${this.apiUrl}/${vaultId}/roundup`, { enabled, step });
+  }
 }
+
