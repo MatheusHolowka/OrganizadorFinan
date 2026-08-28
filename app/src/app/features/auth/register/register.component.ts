@@ -18,7 +18,7 @@ import { ToastService } from '../../../core/services/toast.service';
             ▲
           </div>
           <h1 class="text-xl font-bold text-white tracking-tight">Criar sua conta</h1>
-          <p class="text-xs text-neutral-400 mt-1">Organizador financeiro de alta precisão</p>
+          <p class="text-xs text-neutral-400 mt-1">FINAN — Gestão financeira de alta precisão</p>
         </div>
 
         @if (errorMessage()) {

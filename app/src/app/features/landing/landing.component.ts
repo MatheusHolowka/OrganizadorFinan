@@ -13,6 +13,30 @@ interface SimulatedTransaction {
   isDuplicate?: boolean;
 }
 
+interface SimulatedBankConnection {
+  id: string;
+  name: string;
+  color: string;
+  bgRgba: string;
+  logoUrl: string;
+  accountType: string;
+  balance: number;
+  creditCardLimit: number;
+  creditCardUsed: number;
+  investmentsTotal: number;
+  loansTotal: number;
+  lastSync: string;
+  status: 'synced' | 'syncing' | 'idle';
+  transactions: { description: string; date: string; amount: number; category: string }[];
+}
+
+interface BankItem {
+  id: string;
+  name: string;
+  logoUrl: string;
+  badge: string;
+}
+
 @Component({
   selector: 'app-landing',
   standalone: true,
@@ -37,18 +61,19 @@ interface SimulatedTransaction {
               ▲
             </div>
             <div class="flex items-center gap-2">
-              <span class="font-bold text-sm tracking-tight text-white">Organizador<span class="text-neutral-400">Finan</span></span>
-              <span class="hidden sm:inline-block px-2 py-0.5 rounded-full bg-neutral-900 border border-neutral-800 text-[10px] font-mono text-neutral-400">
-                v2.4
-              </span>
+              <span class="font-bold text-base tracking-tight text-white font-display">FINAN</span>
             </div>
           </div>
 
           <!-- Nav Links -->
           <div class="hidden md:flex items-center gap-6 text-xs font-medium text-neutral-400">
+            <button (click)="scrollTo('homologados')" class="hover:text-emerald-400 transition-colors cursor-pointer flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Bancos Homologados</span>
+            </button>
             <button (click)="scrollTo('console')" class="hover:text-white transition-colors cursor-pointer">Console</button>
+            <button (click)="scrollTo('open-finance')" class="hover:text-white transition-colors cursor-pointer">Open Finance</button>
             <button (click)="scrollTo('features')" class="hover:text-white transition-colors cursor-pointer">Engenharia</button>
-            <button (click)="scrollTo('waterfall')" class="hover:text-white transition-colors cursor-pointer">Faturas 24x</button>
             <button (click)="scrollTo('matrix')" class="hover:text-white transition-colors cursor-pointer">Comparativo</button>
             <button (click)="scrollTo('calculator')" class="hover:text-white transition-colors cursor-pointer">Simulador</button>
           </div>
@@ -78,24 +103,28 @@ interface SimulatedTransaction {
       <!-- ========================================================================= -->
       <!-- 2. HERO SECTION: EDITORIAL HEADLINE + CLEAN AMBIENCE                     -->
       <!-- ========================================================================= -->
-      <section class="relative z-10 pt-36 sm:pt-44 pb-20 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
+      <section class="relative z-10 pt-36 sm:pt-44 pb-12 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto text-center">
         
-        <!-- Refined Release Tag (No noisy ping dot) -->
-        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/60 border border-neutral-800 text-xs text-neutral-300 mb-8 hover:border-neutral-700 transition-all cursor-pointer shadow-sm">
-          <span class="text-neutral-400 font-mono text-[11px]">v2.4</span>
+        <!-- Refined Release Tag for Open Finance -->
+        <div 
+          (click)="scrollTo('homologados')"
+          class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-neutral-900/80 border border-neutral-800 text-xs text-neutral-300 mb-8 hover:border-emerald-500/50 hover:bg-emerald-950/20 transition-all cursor-pointer shadow-sm group"
+        >
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-emerald-400 font-mono text-[11px] font-bold">OPEN FINANCE BRASIL</span>
           <span class="text-neutral-600">/</span>
-          <span class="font-medium text-neutral-300">Quarentena de Metas & Projeção 24x</span>
-          <span class="text-neutral-500">→</span>
+          <span class="font-medium text-neutral-300 group-hover:text-white transition-colors">Sincronização Bancária Direta & Automática</span>
+          <span class="text-neutral-500 group-hover:translate-x-0.5 transition-transform">→</span>
         </div>
 
         <!-- Main Headline -->
         <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-[-0.04em] text-white max-w-4xl mx-auto leading-[1.05]">
-          O sistema operacional das suas <span class="bg-gradient-to-b from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent">finanças pessoais.</span>
+          O sistema operacional do seu <span class="bg-gradient-to-b from-white via-neutral-200 to-neutral-500 bg-clip-text text-transparent">patrimônio financeiro.</span>
         </h1>
 
         <!-- Subtitle -->
         <p class="mt-6 text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto leading-relaxed font-normal">
-          Quarentena matemática de liquidez para seus objetivos, projeção inteligente de faturas futuras de cartão e conciliação instantânea de extratos OFX sem duplicatas.
+          Conexão direta com seus bancos via Open Finance, quarentena matemática de cofres para objetivos e projeção inteligente de faturas futuras de cartão sem autoengano.
         </p>
 
         <!-- CTA Buttons -->
@@ -119,19 +148,22 @@ interface SimulatedTransaction {
           </button>
         </div>
 
-        <!-- Social Proof Metrics Strip (Clean & Crisp) -->
-        <div class="mt-14 pt-8 border-t border-neutral-900 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto text-left">
+        <!-- Social Proof Metrics Strip -->
+        <div class="mt-14 pt-8 border-t border-neutral-900 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto text-left">
+          <div>
+            <div class="text-2xl font-bold text-white tracking-tight font-display flex items-center gap-1.5">
+              <span>+50</span>
+              <span class="text-emerald-400 text-base font-normal">Bancos</span>
+            </div>
+            <div class="text-xs text-neutral-400 mt-0.5">Open Finance Regulado</div>
+          </div>
           <div>
             <div class="text-2xl font-bold text-white tracking-tight font-display">100%</div>
-            <div class="text-xs text-neutral-400 mt-0.5">Isolamento de Metas</div>
+            <div class="text-xs text-neutral-400 mt-0.5">Isolamento em Cofres</div>
           </div>
           <div>
             <div class="text-2xl font-bold text-white tracking-tight font-display">&lt; 180ms</div>
-            <div class="text-xs text-neutral-400 mt-0.5">Leitura de Extratos OFX</div>
-          </div>
-          <div>
-            <div class="text-2xl font-bold text-white tracking-tight font-display">24 Meses</div>
-            <div class="text-xs text-neutral-400 mt-0.5">Cascata de Faturas</div>
+            <div class="text-xs text-neutral-400 mt-0.5">Conciliação de Extratos</div>
           </div>
           <div>
             <div class="text-2xl font-bold text-white tracking-tight font-display">Zero Venda</div>
@@ -142,9 +174,58 @@ interface SimulatedTransaction {
       </section>
 
       <!-- ========================================================================= -->
-      <!-- 3. LIVE INTERACTIVE TREASURY SOFTWARE CONSOLE (THE CLERK/VERCEL SHOWCASE) -->
+      <!-- 2.5 SINGLE-LINE HOMOLOGATED BANKS CAROUSEL                                -->
       <!-- ========================================================================= -->
-      <section id="console" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-28">
+      <section id="homologados" class="relative z-10 py-8 border-y border-neutral-900 bg-black/60 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto px-4 mb-4 text-center">
+          <div class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full bg-emerald-950/40 border border-emerald-800/40 text-[11px] font-mono text-emerald-400">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>INSTITUIÇÕES HOMOLOGADAS • OPEN FINANCE BRASIL</span>
+          </div>
+        </div>
+
+        <!-- Single-Row Infinite Marquee -->
+        <div class="marquee-wrapper py-1.5">
+          <div class="animate-marquee-left flex items-center gap-3.5">
+            <!-- First loop -->
+            @for (bank of importantBanks; track bank.id) {
+              <div class="flex items-center gap-3 px-4 py-2 rounded-2xl bg-neutral-950/90 hover:bg-neutral-900 border border-neutral-800/80 hover:border-neutral-700 transition-all shadow-md shrink-0 cursor-default group">
+                <div class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800/80 flex items-center justify-center p-1.5 shrink-0 group-hover:scale-105 transition-transform overflow-hidden shadow-inner">
+                  <img [src]="bank.logoUrl" [alt]="bank.name" class="w-full h-full object-contain" loading="lazy" />
+                </div>
+                <div class="text-left">
+                  <div class="text-xs font-bold text-white flex items-center gap-1.5 leading-tight">
+                    <span>{{ bank.name }}</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  </div>
+                  <div class="text-[10px] font-mono text-neutral-400 mt-0.5">{{ bank.badge }}</div>
+                </div>
+              </div>
+            }
+            <!-- Duplicate loop for seamless infinite scroll -->
+            @for (bank of importantBanks; track 'dup-' + bank.id) {
+              <div class="flex items-center gap-3 px-4 py-2 rounded-2xl bg-neutral-950/90 hover:bg-neutral-900 border border-neutral-800/80 hover:border-neutral-700 transition-all shadow-md shrink-0 cursor-default group">
+                <div class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800/80 flex items-center justify-center p-1.5 shrink-0 group-hover:scale-105 transition-transform overflow-hidden shadow-inner">
+                  <img [src]="bank.logoUrl" [alt]="bank.name" class="w-full h-full object-contain" loading="lazy" />
+                </div>
+                <div class="text-left">
+                  <div class="text-xs font-bold text-white flex items-center gap-1.5 leading-tight">
+                    <span>{{ bank.name }}</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                  </div>
+                  <div class="text-[10px] font-mono text-neutral-400 mt-0.5">{{ bank.badge }}</div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- 3. LIVE INTERACTIVE TREASURY SOFTWARE CONSOLE                             -->
+      <!-- ========================================================================= -->
+      <section id="console" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
         
         <!-- Border-Beam Container -->
         <div class="border-beam-card p-0.5 shadow-2xl">
@@ -159,32 +240,40 @@ interface SimulatedTransaction {
                   <div class="w-3 h-3 rounded-full bg-[#282828] border border-[#383838]"></div>
                 </div>
                 <div class="text-xs font-mono text-neutral-400 pl-2">
-                  organizadorfinan.app / <span class="text-white">treasury-core</span>
+                  finan.app / <span class="text-white">open-treasury-core</span>
                 </div>
               </div>
 
               <!-- Interactive Tabs -->
-              <div class="flex items-center p-1 rounded-xl bg-black/60 border border-neutral-800 text-xs font-medium">
+              <div class="flex flex-wrap items-center p-1 rounded-xl bg-black/60 border border-neutral-800 text-xs font-medium gap-1">
+                <button
+                  (click)="activeTab.set('openfinance')"
+                  [ngClass]="activeTab() === 'openfinance' ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800/60 shadow-sm' : 'text-neutral-400 hover:text-white border-transparent'"
+                  class="px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeTab() === 'openfinance' ? 'bg-emerald-400' : 'bg-transparent'"></span>
+                  <span>⚡ Open Finance Sync</span>
+                </button>
                 <button
                   (click)="activeTab.set('liquidity')"
-                  [ngClass]="activeTab() === 'liquidity' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white'"
-                  class="px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+                  [ngClass]="activeTab() === 'liquidity' ? 'bg-white/10 text-white shadow-sm border-neutral-700' : 'text-neutral-400 hover:text-white border-transparent'"
+                  class="px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeTab() === 'liquidity' ? 'bg-emerald-400' : 'bg-transparent'"></span>
-                  <span>Quarentena de Liquidez</span>
+                  <span>Quarentena de Cofres</span>
                 </button>
                 <button
                   (click)="activeTab.set('waterfall')"
-                  [ngClass]="activeTab() === 'waterfall' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white'"
-                  class="px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+                  [ngClass]="activeTab() === 'waterfall' ? 'bg-white/10 text-white shadow-sm border-neutral-700' : 'text-neutral-400 hover:text-white border-transparent'"
+                  class="px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeTab() === 'waterfall' ? 'bg-cyan-400' : 'bg-transparent'"></span>
-                  <span>Cascata de Faturas 24x</span>
+                  <span>Cascata 24x</span>
                 </button>
                 <button
                   (click)="activeTab.set('ofx')"
-                  [ngClass]="activeTab() === 'ofx' ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white'"
-                  class="px-3.5 py-1.5 rounded-lg transition-all cursor-pointer flex items-center gap-1.5"
+                  [ngClass]="activeTab() === 'ofx' ? 'bg-white/10 text-white shadow-sm border-neutral-700' : 'text-neutral-400 hover:text-white border-transparent'"
+                  class="px-3.5 py-1.5 rounded-lg border transition-all cursor-pointer flex items-center gap-1.5"
                 >
                   <span class="w-1.5 h-1.5 rounded-full" [ngClass]="activeTab() === 'ofx' ? 'bg-indigo-400' : 'bg-transparent'"></span>
                   <span>Deduplicação OFX</span>
@@ -192,7 +281,179 @@ interface SimulatedTransaction {
               </div>
             </div>
 
-            <!-- TAB 1: LIQUIDITY QUARANTINE SIMULATOR -->
+            <!-- ========================================================================= -->
+            <!-- TAB 0: OPEN FINANCE LIVE MULTI-BANK SYNC (FLAGSHIP FEATURE)               -->
+            <!-- ========================================================================= -->
+            @if (activeTab() === 'openfinance') {
+              <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left Bank Selector & Controls -->
+                <div class="lg:col-span-5 space-y-4 text-left">
+                  <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-mono text-emerald-400">
+                    SINCRONIZAÇÃO EM TEMPO REAL
+                  </div>
+
+                  <h3 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+                    Todos os seus bancos <span class="text-emerald-400">em um só painel</span>
+                  </h3>
+
+                  <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">
+                    Conecte suas contas via Open Finance regulado pelo Banco Central. O FINAN importa automaticamente extratos diários, faturas de cartão, saldos em conta, investimentos e contratos de dívida.
+                  </p>
+
+                  <!-- Bank Connections Switcher -->
+                  <div class="space-y-2 pt-2">
+                    <div class="text-[11px] font-mono text-neutral-400 uppercase">Instituições Conectadas (Selecione para inspecionar):</div>
+                    <div class="grid grid-cols-2 gap-2">
+                      @for (bank of simulatedBanks(); track bank.id) {
+                        <button
+                          (click)="selectBank(bank.id)"
+                          [ngClass]="selectedBank().id === bank.id ? 'border-white/30 bg-neutral-900 shadow-md' : 'border-neutral-800/80 bg-black/40 hover:bg-neutral-900/50'"
+                          class="p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between"
+                        >
+                          <div class="flex items-center gap-2.5">
+                            <div class="w-7 h-7 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center p-1 shrink-0">
+                              <img [src]="bank.logoUrl" [alt]="bank.name" class="w-full h-full object-contain" />
+                            </div>
+                            <div class="truncate">
+                              <div class="text-xs font-bold text-white truncate">{{ bank.name }}</div>
+                              <div class="text-[10px] text-neutral-400 truncate">{{ bank.balance | currencyBrl }}</div>
+                            </div>
+                          </div>
+                          @if (selectedBank().id === bank.id) {
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                          }
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- Sync Action Button -->
+                  <div class="pt-2 flex items-center gap-3">
+                    <button
+                      (click)="triggerSyncSimulation()"
+                      [disabled]="isSyncing()"
+                      class="flex-1 py-3 px-4 rounded-xl bg-neutral-900 hover:bg-neutral-800 text-white font-mono text-xs font-semibold border border-neutral-700 hover:border-emerald-500/50 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                    >
+                      <svg 
+                        class="w-4 h-4 text-emerald-400" 
+                        [ngClass]="isSyncing() ? 'animate-spin' : ''"
+                        fill="none" 
+                        viewBox="0 0 24 24" 
+                        stroke="currentColor"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      <span>{{ isSyncing() ? 'Sincronizando Open Finance...' : 'Sincronizar Agora' }}</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Right Live Card Preview -->
+                <div class="lg:col-span-7 space-y-3">
+                  
+                  <!-- Selected Bank Overview Box -->
+                  <div class="p-6 rounded-2xl bg-neutral-950 border border-neutral-800 shadow-xl space-y-4">
+                    
+                    <!-- Bank Header Details -->
+                    <div class="flex items-center justify-between pb-4 border-b border-neutral-800/80">
+                      <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center p-2 shadow-md">
+                          <img [src]="selectedBank().logoUrl" [alt]="selectedBank().name" class="w-full h-full object-contain" />
+                        </div>
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span class="text-base font-bold text-white">{{ selectedBank().name }}</span>
+                            <span class="px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-800/60 text-[9px] font-mono text-emerald-400">
+                              OPEN FINANCE ATIVO
+                            </span>
+                          </div>
+                          <div class="text-xs text-neutral-400 font-mono mt-0.5">
+                            {{ selectedBank().accountType }} • Sincronizado {{ selectedBank().lastSync }}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="text-right font-mono">
+                        <div class="text-[10px] text-neutral-500 uppercase">Saldo Disponível</div>
+                        <div class="text-xl font-bold text-white">{{ selectedBank().balance | currencyBrl }}</div>
+                      </div>
+                    </div>
+
+                    <!-- Multi-Asset Metrics Grid -->
+                    <div class="grid grid-cols-3 gap-3 font-mono text-xs">
+                      <div class="p-3 rounded-xl bg-black/60 border border-neutral-800/80">
+                        <div class="text-[10px] text-neutral-500 uppercase flex items-center gap-1">
+                          <span>💳 Cartão de Crédito</span>
+                        </div>
+                        <div class="text-sm font-bold text-rose-400 mt-1">
+                          {{ selectedBank().creditCardUsed | currencyBrl }}
+                        </div>
+                        <div class="text-[9px] text-neutral-500 mt-0.5">
+                          Limite: {{ selectedBank().creditCardLimit | currencyBrl }}
+                        </div>
+                      </div>
+
+                      <div class="p-3 rounded-xl bg-black/60 border border-neutral-800/80">
+                        <div class="text-[10px] text-neutral-500 uppercase flex items-center gap-1">
+                          <span>📈 Investimentos</span>
+                        </div>
+                        <div class="text-sm font-bold text-purple-400 mt-1">
+                          {{ selectedBank().investmentsTotal | currencyBrl }}
+                        </div>
+                        <div class="text-[9px] text-neutral-500 mt-0.5">
+                          CDB / Tesouro / Ações
+                        </div>
+                      </div>
+
+                      <div class="p-3 rounded-xl bg-black/60 border border-neutral-800/80">
+                        <div class="text-[10px] text-neutral-500 uppercase flex items-center gap-1">
+                          <span>📉 Passivos / Dívida</span>
+                        </div>
+                        <div class="text-sm font-bold text-amber-400 mt-1">
+                          {{ selectedBank().loansTotal | currencyBrl }}
+                        </div>
+                        <div class="text-[9px] text-neutral-500 mt-0.5">
+                          Financiamentos
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Live Streamed Transactions Feed -->
+                    <div class="pt-2">
+                      <div class="flex justify-between items-center text-[10px] font-mono text-neutral-500 uppercase pb-2 border-b border-neutral-800">
+                        <span>Lançamentos Recentes Importados Automaticamente</span>
+                        <span class="text-emerald-400">Via API Pluggy / BCB</span>
+                      </div>
+
+                      <div class="space-y-1.5 mt-2 font-mono text-xs">
+                        @for (tx of selectedBank().transactions; track tx.description) {
+                          <div class="p-2.5 rounded-lg bg-black/40 border border-neutral-900 flex items-center justify-between">
+                            <div class="flex items-center gap-2.5">
+                              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                              <div>
+                                <div class="text-neutral-200 font-bold">{{ tx.description }}</div>
+                                <div class="text-[10px] text-neutral-500">{{ tx.date }} • {{ tx.category }}</div>
+                              </div>
+                            </div>
+                            <div class="font-bold" [ngClass]="tx.amount > 0 ? 'text-emerald-400' : 'text-white'">
+                              {{ (tx.amount > 0 ? '+' : '') }}{{ tx.amount | currencyBrl }}
+                            </div>
+                          </div>
+                        }
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            }
+
+            <!-- ========================================================================= -->
+            <!-- TAB 1: LIQUIDITY QUARANTINE SIMULATOR                                     -->
+            <!-- ========================================================================= -->
             @if (activeTab() === 'liquidity') {
               <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 
@@ -203,11 +464,11 @@ interface SimulatedTransaction {
                   </div>
 
                   <h3 class="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                    Seu saldo diário livre <span class="text-emerald-400">livre de autoengano</span>
+                    Seu saldo diário <span class="text-emerald-400">livre de autoengano</span>
                   </h3>
 
                   <p class="text-xs sm:text-sm text-neutral-400 leading-relaxed">
-                    Quando você guarda dinheiro para metas (casa própria, reserva ou viagens), o OrganizadorFinan deduz esse valor do seu saldo disponível, calculando exatamente quanto você pode gastar por dia.
+                    Quando você guarda dinheiro para metas (casa própria, reserva ou viagens), o FINAN deduz esse valor do seu saldo disponível, calculando exatamente quanto você pode gastar por dia.
                   </p>
 
                   <!-- Salary Slider -->
@@ -311,7 +572,9 @@ interface SimulatedTransaction {
               </div>
             }
 
-            <!-- TAB 2: WATERFALL INVOICE TIMELINE -->
+            <!-- ========================================================================= -->
+            <!-- TAB 2: WATERFALL INVOICE TIMELINE                                         -->
+            <!-- ========================================================================= -->
             @if (activeTab() === 'waterfall') {
               <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div class="lg:col-span-5 space-y-4 text-left">
@@ -322,7 +585,7 @@ interface SimulatedTransaction {
                     Elimine a surpresa da fatura do mês que vem
                   </h3>
                   <p class="text-xs text-neutral-400 leading-relaxed">
-                    Comprou parcelado? O sistema mapeia o cruzamento exato entre a data de corte e o vencimento em cada cartão.
+                    Comprou parcelado? O FINAN mapeia o cruzamento exato entre a data de corte e o vencimento em cada cartão.
                   </p>
 
                   <div class="p-4 rounded-xl bg-black/50 border border-neutral-800/80 space-y-3">
@@ -386,7 +649,9 @@ interface SimulatedTransaction {
               </div>
             }
 
-            <!-- TAB 3: OFX DEDUPLICATION TERMINAL -->
+            <!-- ========================================================================= -->
+            <!-- TAB 3: OFX DEDUPLICATION TERMINAL                                         -->
+            <!-- ========================================================================= -->
             @if (activeTab() === 'ofx') {
               <div class="pt-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div class="lg:col-span-5 space-y-4 text-left">
@@ -394,10 +659,10 @@ interface SimulatedTransaction {
                     TRAVA FITID ANTI-DUPLICATAS
                   </div>
                   <h3 class="text-2xl font-bold tracking-tight text-white">
-                    Importe extratos bancários com precisão cirúrgica
+                    Importação de arquivos OFX/CSV com precisão cirúrgica
                   </h3>
                   <p class="text-xs text-neutral-400 leading-relaxed">
-                    Baixe seu extrato .OFX ou .CSV de qualquer banco brasileiro (Nubank, Itaú, Inter, Bradesco). O motor detecta lançamentos repetidos por hash e bloqueia duplicidades.
+                    Prefere subir arquivos manuais? O FINAN processa qualquer extrato .OFX ou .CSV, analisa a chave FITID e descarta cobranças repetidas automaticamente.
                   </p>
 
                   <div class="p-4 rounded-xl bg-black/60 border border-neutral-800 font-mono text-xs text-neutral-400 space-y-1.5">
@@ -449,7 +714,102 @@ interface SimulatedTransaction {
       </section>
 
       <!-- ========================================================================= -->
-      <!-- 4. BENTO GRID OF CORE ENGINEERING CAPABILITIES                           -->
+      <!-- 4. OPEN FINANCE HIGHLIGHT SECTION (CLEAN & NON-REDUNDANT)                 -->
+      <!-- ========================================================================= -->
+      <section id="open-finance" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-neutral-900 text-left">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          
+          <div class="lg:col-span-6 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-800/60 text-xs font-mono text-emerald-400">
+              ⚡ OPEN FINANCE BRASIL
+            </div>
+            
+            <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+              Sincronização bancária direta, sem planilhas e sem digitação.
+            </h2>
+            
+            <p class="text-sm sm:text-base text-neutral-400 leading-relaxed font-normal">
+              Conecte sua conta em mais de 50 instituições bancárias reguladas pelo Banco Central do Brasil. O FINAN lê suas transações diárias, limites de faturas, posições de investimento e contratos de empréstimo em tempo real.
+            </p>
+
+            <div class="space-y-3 pt-2 font-mono text-xs">
+              <div class="flex items-center gap-3 text-neutral-300">
+                <span class="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+                <span>Consentimento revogável e criptografia bancária ponta a ponta</span>
+              </div>
+              <div class="flex items-center gap-3 text-neutral-300">
+                <span class="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+                <span>Rastreamento consolidado de CDBs, Ações, FIIs e Tesouro Direto</span>
+              </div>
+              <div class="flex items-center gap-3 text-neutral-300">
+                <span class="w-5 h-5 rounded-md bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold">✓</span>
+                <span>Mapeamento automático de passivos, parcelas e financiamentos</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- High-End Security & Protocol Card (Replacing redundant bank buttons) -->
+          <div class="lg:col-span-6 p-6 sm:p-8 rounded-3xl bg-neutral-950 border border-neutral-800 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-neutral-800/80 pb-4">
+              <div class="flex items-center gap-2.5">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                <span class="font-mono text-xs font-bold text-white uppercase tracking-wider">Protocolo de Segurança & API Oficial</span>
+              </div>
+              <span class="text-[10px] font-mono text-neutral-500">BACEN / Resolução Conjunta nº 1</span>
+            </div>
+
+            <div class="space-y-3 font-mono text-xs">
+              <div class="p-4 rounded-2xl bg-black/60 border border-neutral-800/80 flex items-start gap-3.5">
+                <div class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-base shrink-0">
+                  🔒
+                </div>
+                <div>
+                  <div class="font-bold text-white">Permissão Somente-Leitura (Read-Only)</div>
+                  <div class="text-[11px] text-neutral-400 font-sans mt-0.5 leading-relaxed">
+                    O FINAN nunca realiza transferências nem movimentações. Apenas importa extratos e saldos autorizados por você.
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-black/60 border border-neutral-800/80 flex items-start gap-3.5">
+                <div class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-base shrink-0">
+                  🛡️
+                </div>
+                <div>
+                  <div class="font-bold text-white">Criptografia Ponta a Ponta (TLS 1.3 / AES-256)</div>
+                  <div class="text-[11px] text-neutral-400 font-sans mt-0.5 leading-relaxed">
+                    Seus dados trafegam sob o mesmo padrão rigoroso de proteção criptográfica exigido pelo Banco Central.
+                  </div>
+                </div>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-black/60 border border-neutral-800/80 flex items-start gap-3.5">
+                <div class="w-8 h-8 rounded-xl bg-neutral-900 border border-neutral-800 flex items-center justify-center text-base shrink-0">
+                  ⚡
+                </div>
+                <div>
+                  <div class="font-bold text-white">Consentimento 100% Sob Seu Controle</div>
+                  <div class="text-[11px] text-neutral-400 font-sans mt-0.5 leading-relaxed">
+                    Você pode revogar ou desconectar o acesso bancário a qualquer momento direto pelo painel com 1 clique.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-emerald-950/20 border border-emerald-800/40 flex items-center justify-between text-xs font-mono text-emerald-300">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span>Auditado e em Conformidade com a LGPD</span>
+              </div>
+              <span class="text-emerald-400 font-bold">Pluggy Certified</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- 5. BENTO GRID OF CORE ENGINEERING CAPABILITIES                           -->
       <!-- ========================================================================= -->
       <section id="features" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-neutral-900 text-left">
         
@@ -462,69 +822,85 @@ interface SimulatedTransaction {
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           
-          <!-- Bento 1 -->
-          <div class="md:col-span-2 p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
+          <!-- Bento 1 (Large Open Finance) -->
+          <div class="md:col-span-2 p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-emerald-500/40 transition-all">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400 mb-6 font-bold text-base">
+                ⚡
+              </div>
+              <h3 class="text-xl font-bold text-white tracking-tight">Conexão Multi-Bancos via Open Finance</h3>
+              <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
+                Chega de planilhas desatualizadas ou importações manuais todos os dias. O FINAN mantém suas contas do Nubank, Itaú, Inter, Bradesco, Santander, BTG e XP conectadas com atualização automática de saldo e extrato.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-neutral-900 flex flex-wrap items-center gap-4 text-xs font-mono text-emerald-400">
+              <span>✓ Extratos e saldos em tempo real</span>
+              <span>✓ Cartões de crédito consolidados</span>
+              <span>✓ Conexão segura e auditada</span>
+            </div>
+          </div>
+
+          <!-- Bento 2 (Investments & Loans) -->
+          <div class="p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
+            <div>
+              <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
+                📈
+              </div>
+              <h3 class="text-xl font-bold text-white tracking-tight">Ativos & Passivos</h3>
+              <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
+                Acompanhe investimentos em renda fixa, tesouro, ações e financiamentos/empréstimos sincronizados diretamente das contas bancárias.
+              </p>
+            </div>
+            <div class="mt-6 pt-4 border-t border-neutral-900 text-xs font-mono text-neutral-500">
+              Patrimônio líquido real calculado
+            </div>
+          </div>
+
+          <!-- Bento 3 (Vaults) -->
+          <div class="p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
             <div>
               <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
                 🔒
               </div>
               <h3 class="text-xl font-bold text-white tracking-tight">Cofres com Quarentena Automática</h3>
               <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
-                Dinheiro de metas não é dinheiro livre. Crie cofres para a entrada da casa própria, reserva de emergência e viagens com aportes recorrentes e blindagem contra impulsos de consumo.
+                Dinheiro de metas não é saldo livre. Isole aportes para reserva de emergência, viagens e casa própria com cálculo de teto diário seguro.
               </p>
             </div>
-            <div class="mt-6 pt-4 border-t border-neutral-900 flex items-center gap-4 text-xs font-mono text-emerald-400">
-              <span>✓ Proteção contra compras impulsivas</span>
-              <span>✓ Histórico de aportes e rendimento</span>
+            <div class="mt-6 pt-4 border-t border-neutral-900 text-xs font-mono text-emerald-400">
+              ✓ Proteção contra compras por impulso
             </div>
           </div>
 
-          <!-- Bento 2 -->
-          <div class="p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
-            <div>
-              <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
-                ⚡
-              </div>
-              <h3 class="text-xl font-bold text-white tracking-tight">Conciliação OFX/CSV</h3>
-              <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
-                Importe faturas e extratos em segundos. O algoritmo deduplica cobranças repetidas e categoriza lançamentos automaticamente.
-              </p>
-            </div>
-            <div class="mt-6 pt-4 border-t border-neutral-900 text-xs font-mono text-neutral-500">
-              Compatível com todos os bancos brasileiros
-            </div>
-          </div>
-
-          <!-- Bento 3 -->
+          <!-- Bento 4 (Waterfall) -->
           <div class="p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
             <div>
               <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
                 💳
               </div>
-              <h3 class="text-xl font-bold text-white tracking-tight">Projeção em Cascata</h3>
+              <h3 class="text-xl font-bold text-white tracking-tight">Projeção em Cascata 24x</h3>
               <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
-                Visualização antecipada de faturas futuras parceladas em até 24x com data de corte de ciclo calculada automaticamente.
+                Mapeamento antecipado de faturas futuras parceladas com ciclo de corte e vencimento de cada cartão registrado.
               </p>
             </div>
             <div class="mt-6 pt-4 border-t border-neutral-900 text-xs font-mono text-neutral-500">
-              Zero dívidas surpresa no cartão
+              Zero sustos com compras parceladas
             </div>
           </div>
 
-          <!-- Bento 4 -->
-          <div class="md:col-span-2 p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
+          <!-- Bento 5 (Family Planning) -->
+          <div class="p-8 rounded-2xl bg-neutral-950 border border-neutral-800/80 flex flex-col justify-between hover:border-neutral-700 transition-all">
             <div>
               <div class="w-10 h-10 rounded-lg bg-neutral-900 border border-neutral-800 flex items-center justify-center text-white mb-6">
                 👥
               </div>
-              <h3 class="text-xl font-bold text-white tracking-tight">Planejamento Familiar & Contas Compartilhadas</h3>
+              <h3 class="text-xl font-bold text-white tracking-tight">Planejamento Familiar</h3>
               <p class="text-sm text-neutral-400 mt-2 leading-relaxed">
-                Organize despesas da casa em conjunto com seu parceiro(a) mantendo a total privacidade e autonomia sobre suas contas individuais.
+                Organize despesas da casa com seu parceiro(a) mantendo total privacidade e autonomia sobre suas contas individuais.
               </p>
             </div>
-            <div class="mt-6 pt-4 border-t border-neutral-900 flex items-center gap-4 text-xs font-mono text-neutral-400">
-              <span>✓ Visão consolidada da residência</span>
-              <span>✓ Acesso individual privado</span>
+            <div class="mt-6 pt-4 border-t border-neutral-900 text-xs font-mono text-neutral-500">
+              Visão consolidada da residência
             </div>
           </div>
 
@@ -532,7 +908,7 @@ interface SimulatedTransaction {
       </section>
 
       <!-- ========================================================================= -->
-      <!-- 5. REALITY COMPARISON MATRIX (CLERK / VERCEL STYLE)                      -->
+      <!-- 6. REALITY COMPARISON MATRIX                                              -->
       <!-- ========================================================================= -->
       <section id="matrix" class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-neutral-900 text-left">
         
@@ -550,16 +926,28 @@ interface SimulatedTransaction {
                 <tr class="bg-black border-b border-neutral-800 text-neutral-500 uppercase text-[10px]">
                   <th class="p-4 sm:p-5">Critério</th>
                   <th class="p-4 sm:p-5 text-neutral-500">Planilhas Excel/Sheets</th>
-                  <th class="p-4 sm:p-5 text-neutral-500">App do Banco Convencional</th>
-                  <th class="p-4 sm:p-5 text-white font-bold bg-neutral-900/60">OrganizadorFinan</th>
+                  <th class="p-4 sm:p-5 text-neutral-500">App do Banco Tradicional</th>
+                  <th class="p-4 sm:p-5 text-white font-bold bg-neutral-900/60">FINAN</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-neutral-800/80 text-neutral-300">
+                <tr>
+                  <td class="p-4 sm:p-5 font-bold text-white">Sincronização Automática Open Finance</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Digitação 100% manual</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Preso ao próprio banco</td>
+                  <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ +50 bancos conectados</td>
+                </tr>
                 <tr>
                   <td class="p-4 sm:p-5 font-bold text-white">Quarentena de Metas (Cofres Blindados)</td>
                   <td class="p-4 sm:p-5 text-neutral-600">❌ Quebra facilmente</td>
                   <td class="p-4 sm:p-5 text-neutral-600">❌ Mistura com saldo corrente</td>
                   <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ Quarentena matemática 100%</td>
+                </tr>
+                <tr>
+                  <td class="p-4 sm:p-5 font-bold text-white">Ativos & Passivos Sincronizados</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Rapidamente desatualizado</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Visão incompleta</td>
+                  <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ Investimentos & Financiamentos</td>
                 </tr>
                 <tr>
                   <td class="p-4 sm:p-5 font-bold text-white">Cascata de Faturas Parceladas</td>
@@ -568,9 +956,9 @@ interface SimulatedTransaction {
                   <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ Projeção até 24 meses</td>
                 </tr>
                 <tr>
-                  <td class="p-4 sm:p-5 font-bold text-white">Deduplicação OFX sem Erros</td>
-                  <td class="p-4 sm:p-5 text-neutral-600">❌ Digitação manual</td>
-                  <td class="p-4 sm:p-5 text-neutral-600">❌ Preso ao banco dele</td>
+                  <td class="p-4 sm:p-5 font-bold text-white">Deduplicação OFX/CSV Híbrida</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Risco de duplicidade</td>
+                  <td class="p-4 sm:p-5 text-neutral-600">❌ Incompatível</td>
                   <td class="p-4 sm:p-5 text-emerald-400 font-bold bg-neutral-900/40">✓ Hash FITID instantâneo</td>
                 </tr>
                 <tr>
@@ -587,7 +975,7 @@ interface SimulatedTransaction {
       </section>
 
       <!-- ========================================================================= -->
-      <!-- 6. GOALS & COMPOUND RUNWAY CALCULATOR                                    -->
+      <!-- 7. GOALS & COMPOUND RUNWAY CALCULATOR                                     -->
       <!-- ========================================================================= -->
       <section id="calculator" class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-neutral-900 text-center">
         <div class="p-8 sm:p-12 rounded-3xl bg-neutral-950 border border-neutral-800/80 shadow-2xl">
@@ -597,7 +985,7 @@ interface SimulatedTransaction {
             Em quantos meses você atinge sua meta?
           </h2>
           <p class="text-xs sm:text-sm text-neutral-400 mt-2 max-w-xl mx-auto">
-            Com aportes blindados e isolados do seu saldo livre diário, você alcança seus sonhos sem desvios.
+            Com aportes blindados e isolados do seu saldo livre diário, você alcança seus objetivos com clareza.
           </p>
 
           <!-- Quick Presets -->
@@ -656,7 +1044,7 @@ interface SimulatedTransaction {
       </section>
 
       <!-- ========================================================================= -->
-      <!-- 7. HIGH-CONVERSION CTA FOOTER (VERCEL STYLE)                              -->
+      <!-- 8. HIGH-CONVERSION CTA FOOTER                                            -->
       <!-- ========================================================================= -->
       <section class="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center border-t border-neutral-900">
         <div class="max-w-2xl mx-auto space-y-6">
@@ -664,7 +1052,7 @@ interface SimulatedTransaction {
             Assuma o controle total do seu dinheiro hoje.
           </h2>
           <p class="text-sm text-neutral-400">
-            Comece em menos de 1 minuto. Sem cartão de crédito obrigatório.
+            Conecte seus bancos em segundos. Sem burocracia, 100% seguro.
           </p>
 
           <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -689,12 +1077,12 @@ interface SimulatedTransaction {
         <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-2 text-neutral-400">
             <span>▲</span>
-            <span class="font-bold text-white">OrganizadorFinan</span>
+            <span class="font-bold text-white">FINAN</span>
             <span>—</span>
             <span>Finanças com Engenharia & Soberania</span>
           </div>
 
-          <div>© 2026 OrganizadorFinan. Todos os direitos reservados.</div>
+          <div>© 2026 FINAN. Todos os direitos reservados.</div>
 
           <div class="flex items-center gap-4 text-neutral-400">
             <a routerLink="/login" class="hover:text-white transition-colors">Entrar</a>
@@ -708,7 +1096,132 @@ interface SimulatedTransaction {
 })
 export class LandingComponent {
   // Tabs Signal
-  activeTab = signal<'liquidity' | 'waterfall' | 'ofx'>('liquidity');
+  activeTab = signal<'openfinance' | 'liquidity' | 'waterfall' | 'ofx'>('openfinance');
+
+  // Clean Single-Row Important Banks for Infinite Marquee Carousel
+  importantBanks: BankItem[] = [
+    { id: 'nubank', name: 'Nubank', logoUrl: '/assets/banks/nubank.svg', badge: 'Digital & Cartões' },
+    { id: 'itau', name: 'Itaú Unibanco', logoUrl: '/assets/banks/itau.svg', badge: 'Personalité & Black' },
+    { id: 'inter', name: 'Banco Inter', logoUrl: '/assets/banks/inter.svg', badge: 'Global & Invest' },
+    { id: 'bradesco', name: 'Bradesco', logoUrl: '/assets/banks/bradesco.svg', badge: 'Prime & Financiamento' },
+    { id: 'santander', name: 'Santander', logoUrl: '/assets/banks/santander.svg', badge: 'Select & Cartões' },
+    { id: 'bb', name: 'Banco do Brasil', logoUrl: '/assets/banks/bb.svg', badge: 'Estilo & Investimentos' },
+    { id: 'caixa', name: 'Caixa Econômica', logoUrl: '/assets/banks/caixa.svg', badge: 'Crédito Imobiliário' },
+    { id: 'btg', name: 'BTG Pactual', logoUrl: '/assets/banks/btg.svg', badge: 'Private & Invest' },
+    { id: 'xp', name: 'XP Investimentos', logoUrl: '/assets/banks/xp.svg', badge: 'Renda Fixa & Ações' },
+    { id: 'c6', name: 'C6 Bank', logoUrl: '/assets/banks/c6.svg', badge: 'Carbon & Global' },
+    { id: 'sicredi', name: 'Sicredi', logoUrl: '/assets/banks/sicredi.svg', badge: 'Cooperativismo' },
+    { id: 'safra', name: 'Banco Safra', logoUrl: '/assets/banks/safra.svg', badge: 'Alta Renda' },
+    { id: 'mercadopago', name: 'Mercado Pago', logoUrl: '/assets/banks/mercadopago.svg', badge: 'Conta Digital' },
+    { id: 'picpay', name: 'PicPay', logoUrl: '/assets/banks/picpay.svg', badge: 'Pagamentos & Pix' },
+  ];
+
+  // Open Finance Interactive Simulation
+  isSyncing = signal<boolean>(false);
+
+  simulatedBanks = signal<SimulatedBankConnection[]>([
+    {
+      id: 'nubank',
+      name: 'Nubank',
+      color: '#820AD1',
+      bgRgba: 'rgba(130, 10, 209, 0.15)',
+      logoUrl: '/assets/banks/nubank.svg',
+      accountType: 'Conta Digital + Cartão Ultravioleta',
+      balance: 14280.50,
+      creditCardLimit: 25000.00,
+      creditCardUsed: 4320.80,
+      investmentsTotal: 35000.00,
+      loansTotal: 0.00,
+      lastSync: 'Há 2 minutos',
+      status: 'synced',
+      transactions: [
+        { description: 'SUPERMERCADO ST. MARCHE', date: 'Hoje', amount: -284.60, category: 'Alimentação' },
+        { description: 'POSTO IPIRANGA // COMBUSTÍVEL', date: 'Ontem', amount: -190.00, category: 'Transporte' },
+        { description: 'TRANSFERÊNCIA PIX RECEBIDA', date: '26/08', amount: 3500.00, category: 'Renda' },
+      ],
+    },
+    {
+      id: 'itau',
+      name: 'Itaú Personalité',
+      color: '#EC7000',
+      bgRgba: 'rgba(236, 112, 0, 0.15)',
+      logoUrl: '/assets/banks/itau.svg',
+      accountType: 'Conta Corrente + Cartão Black',
+      balance: 28450.00,
+      creditCardLimit: 40000.00,
+      creditCardUsed: 6180.20,
+      investmentsTotal: 120000.00,
+      loansTotal: 45000.00,
+      lastSync: 'Há 5 minutos',
+      status: 'synced',
+      transactions: [
+        { description: 'RENDIMENTO SALARIAL // TED', date: 'Hoje', amount: 12500.00, category: 'Renda' },
+        { description: 'CONDOMÍNIO RESIDENCIAL', date: '25/08', amount: -1150.00, category: 'Moradia' },
+        { description: 'FARMÁCIA DROGASIL', date: '24/08', amount: -145.80, category: 'Saúde' },
+      ],
+    },
+    {
+      id: 'inter',
+      name: 'Banco Inter',
+      color: '#FF7A00',
+      bgRgba: 'rgba(255, 122, 0, 0.15)',
+      logoUrl: '/assets/banks/inter.svg',
+      accountType: 'Conta Global & Investimentos',
+      balance: 9150.25,
+      creditCardLimit: 15000.00,
+      creditCardUsed: 1450.00,
+      investmentsTotal: 68500.00,
+      loansTotal: 0.00,
+      lastSync: 'Há 12 minutos',
+      status: 'synced',
+      transactions: [
+        { description: 'DIVIDENDOS TESOURO DIRETO', date: '22/08', amount: 480.20, category: 'Investimentos' },
+        { description: 'APPLE.COM/BILL // ASSINATURA', date: '21/08', amount: -49.90, category: 'Tecnologia' },
+      ],
+    },
+    {
+      id: 'btg',
+      name: 'BTG Pactual',
+      color: '#002B49',
+      bgRgba: 'rgba(0, 43, 73, 0.2)',
+      logoUrl: '/assets/banks/btg.svg',
+      accountType: 'Carteira de Investimentos & Banking',
+      balance: 5320.00,
+      creditCardLimit: 30000.00,
+      creditCardUsed: 0.00,
+      investmentsTotal: 240000.00,
+      loansTotal: 0.00,
+      lastSync: 'Há 1 hora',
+      status: 'synced',
+      transactions: [
+        { description: 'PROVENTOS FII HGLG11', date: '15/08', amount: 320.00, category: 'Investimentos' },
+        { description: 'APORTE CDB DI 110%', date: '10/08', amount: -5000.00, category: 'Aporte' },
+      ],
+    },
+  ]);
+
+  selectedBankId = signal<string>('nubank');
+
+  selectedBank = computed(() => {
+    return this.simulatedBanks().find((b) => b.id === this.selectedBankId()) || this.simulatedBanks()[0];
+  });
+
+  selectBank(id: string) {
+    this.selectedBankId.set(id);
+  }
+
+  triggerSyncSimulation() {
+    this.isSyncing.set(true);
+    setTimeout(() => {
+      this.isSyncing.set(false);
+      this.simulatedBanks.update((banks) =>
+        banks.map((b) => ({
+          ...b,
+          lastSync: 'Agora mesmo',
+        }))
+      );
+    }, 900);
+  }
 
   // Hero Interactive Treasury Signals
   income = signal<number>(8500);

@@ -19,7 +19,7 @@ export class MailService {
     } else if (rawFrom) {
       this.defaultFrom = `${rawFrom} <noreply@organizadorfinan.com.br>`;
     } else {
-      this.defaultFrom = 'FinanOrganizador <noreply@organizadorfinan.com.br>';
+      this.defaultFrom = 'FINAN <noreply@organizadorfinan.com.br>';
     }
 
     this.resendApiKey =
@@ -52,7 +52,7 @@ export class MailService {
 
   async sendEmailVerification(to: string, name: string, code: string) {
     const verifyLink = `${this.frontendUrl}/verify-email?email=${encodeURIComponent(to)}&code=${code}`;
-    const subject = `✉️ Seu Código de Confirmação: ${code} - FinanOrganizador`;
+    const subject = `✉️ Seu Código de Confirmação: ${code} - FINAN`;
 
     this.logger.log(`\n======================================================`);
     this.logger.log(`[CÓDIGO DE CONFIRMAÇÃO GERADO]`);
@@ -64,7 +64,7 @@ export class MailService {
     const html = `
       <div style="background-color: #030712; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px 20px; max-width: 600px; margin: 0 auto; border-radius: 24px; border: 1px solid #10b981;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #10b981; font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0.5px;">FinanOrganizador</h1>
+          <h1 style="color: #10b981; font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0.5px;">FINAN</h1>
           <p style="color: #64748b; font-size: 12px; margin-top: 4px;">Confirmação de E-mail</p>
         </div>
 
@@ -95,7 +95,7 @@ export class MailService {
         </div>
 
         <p style="color: #475569; font-size: 11px; text-align: center; margin-top: 30px;">
-          Se você não solicitou este cadastro no FinanOrganizador, ignore este e-mail.
+          Se você não solicitou este cadastro no FINAN, ignore este e-mail.
         </p>
       </div>
     `;
@@ -105,7 +105,7 @@ export class MailService {
 
   async sendPasswordResetEmail(to: string, name: string, token: string) {
     const resetLink = `${this.frontendUrl}/reset-password?token=${token}`;
-    const subject = '🔒 Redefinição de Senha - FinanOrganizador';
+    const subject = '🔒 Redefinição de Senha - FINAN';
 
     this.logger.log(`\n======================================================`);
     this.logger.log(`[LINK DE RECUPERAÇÃO DE SENHA]`);
@@ -116,14 +116,14 @@ export class MailService {
     const html = `
       <div style="background-color: #030712; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px 20px; max-width: 600px; margin: 0 auto; border-radius: 24px; border: 1px solid #1e293b;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #10b981; font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0.5px;">FinanOrganizador</h1>
+          <h1 style="color: #10b981; font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0.5px;">FINAN</h1>
           <p style="color: #64748b; font-size: 12px; margin-top: 4px;">Recuperação de Acesso</p>
         </div>
 
         <div style="background-color: #0f172a; padding: 30px; border-radius: 20px; border: 1px solid #334155;">
           <h2 style="color: #ffffff; font-size: 18px; margin-top: 0;">Olá, ${name}!</h2>
           <p style="color: #cbd5e1; font-size: 14px; line-height: 1.6;">
-            Recebemos uma solicitação para redefinir a senha da sua conta no FinanOrganizador.
+            Recebemos uma solicitação para redefinir a senha da sua conta no FINAN.
           </p>
 
           <div style="text-align: center; margin: 35px 0;">
@@ -149,13 +149,13 @@ export class MailService {
 
   async sendAccountLockedEmail(to: string, name: string, token: string) {
     const resetLink = `${this.frontendUrl}/reset-password?token=${token}`;
-    const subject = '⚠️ Conta Bloqueada por Segurança - FinanOrganizador';
+    const subject = '⚠️ Conta Bloqueada por Segurança - FINAN';
 
     const html = `
       <div style="background-color: #030712; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px 20px; max-width: 600px; margin: 0 auto; border-radius: 24px; border: 1px solid #e11d48;">
         <div style="text-align: center; margin-bottom: 30px;">
           <h1 style="color: #f43f5e; font-size: 24px; margin: 0; font-weight: 800; letter-spacing: -0.5px;">Alerta de Segurança</h1>
-          <p style="color: #64748b; font-size: 12px; margin-top: 4px;">FinanOrganizador Pro</p>
+          <p style="color: #64748b; font-size: 12px; margin-top: 4px;">FINAN Pro</p>
         </div>
 
         <div style="background-color: #0f172a; padding: 30px; border-radius: 20px; border: 1px solid #334155;">
@@ -190,12 +190,12 @@ export class MailService {
 
   async sendFamilyInviteEmail(to: string, inviterName: string, familyName: string) {
     const inviteLink = `${this.frontendUrl}/profile?tab=family`;
-    const subject = `👨‍👩‍👧‍👦 Convite para a Família "${familyName}" - FinanOrganizador`;
+    const subject = `👨‍👩‍👧‍👦 Convite para a Família "${familyName}" - FINAN`;
 
     const html = `
       <div style="background-color: #030712; color: #f8fafc; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 40px 20px; max-width: 600px; margin: 0 auto; border-radius: 24px; border: 1px solid #6366f1;">
         <div style="text-align: center; margin-bottom: 30px;">
-          <h1 style="color: #818cf8; font-size: 24px; margin: 0; font-weight: 800;">FinanOrganizador</h1>
+          <h1 style="color: #818cf8; font-size: 24px; margin: 0; font-weight: 800;">FINAN</h1>
           <p style="color: #64748b; font-size: 12px; margin-top: 4px;">Finanças Familiares Compartilhadas</p>
         </div>
 

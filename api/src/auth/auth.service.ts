@@ -121,7 +121,7 @@ export class AuthService {
     const jwtToken = this.generateToken(user.id, user.email);
 
     return {
-      message: 'E-mail confirmado com sucesso! Bem-vindo ao FinanOrganizador.',
+      message: 'E-mail confirmado com sucesso! Bem-vindo ao FINAN.',
       token: jwtToken,
       user: {
         id: user.id,

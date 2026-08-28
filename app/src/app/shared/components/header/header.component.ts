@@ -16,8 +16,7 @@ import { FamilyService } from '../../../core/services/family.service';
             ▲
           </div>
           <div>
-            <span class="font-bold text-base text-white tracking-tight">Organizador<span class="text-neutral-400">Finan</span></span>
-            <span class="hidden md:inline-block ml-2 text-[10px] font-mono px-2 py-0.5 rounded-full bg-neutral-900 text-neutral-400 border border-neutral-800">v2.4</span>
+            <span class="font-bold text-base text-white tracking-tight font-display">FINAN</span>
           </div>
         </a>
       </div>

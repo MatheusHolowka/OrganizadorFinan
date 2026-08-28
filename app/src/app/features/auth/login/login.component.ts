@@ -19,7 +19,7 @@ import { ModalComponent } from '../../../shared/components/modal/modal.component
             ▲
           </div>
           <h1 class="text-xl font-bold text-white tracking-tight">Bem-vindo de volta</h1>
-          <p class="text-xs text-neutral-400 mt-1">Acesse sua conta no OrganizadorFinan</p>
+          <p class="text-xs text-neutral-400 mt-1">Acesse sua conta no FINAN</p>
         </div>
 
         @if (errorMessage()) {

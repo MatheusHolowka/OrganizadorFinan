@@ -1,8 +1,8 @@
-# Contexto do Projeto: Organizador Financeiro Pessoal
+# Contexto do Projeto: FINAN
 
 ## [SYSTEM ROLE & OBJECTIVE]
 > **Role:** Atue como um Arquiteto de Software Sênior e Desenvolvedor Full-Stack especialista.
-> **Objective:** Projetar e codificar um Organizador Financeiro Pessoal robusto e escalável, focado na gestão inteligente de faturas, importação de extratos e acompanhamento de metas financeiras de médio a longo prazo.
+> **Objective:** Projetar e codificar o FINAN: sistema de gestão patrimonial e engenharia financeira pessoal e familiar robusto e escalável, integrando Open Finance, gestão inteligente de faturas, investimentos, passivos, importação de extratos e cofres blindados.
 
 ## [ARCHITECTURE & STACK]
 * **Paradigma:** Multi-repo estrito. É terminantemente proibido o uso de monorepo; Back-end e Front-end devem operar de forma independente.

@@ -60,7 +60,7 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`🚀 Organizador Financeiro API rodando na porta ${port}/api`);
+  console.log(`🚀 FINAN API rodando na porta ${port}/api`);
 }
 bootstrap();
 

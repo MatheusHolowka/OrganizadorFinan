@@ -1,26 +1,28 @@
-# 🚀 OrganizadorFinan
+# 🚀 FINAN
 
-Sistema de Gestão e Planejamento Financeiro Pessoal & Familiar com Inteligência de Cartões, Isolamento Virtual de Cofres, Motor Anti-Duplicidade de Extratos e Autenticação Segura com Confirmação por Código de 6 Dígitos (OTP).
+Sistema de Gestão e Engenharia Financeira Pessoal & Familiar com Integração **Open Finance Brasil** (Sincronização Bancária Automática, Investimentos e Empréstimos), Inteligência Preditiva de Cartões, Isolamento Virtual de Cofres e Conciliação Inteligente de Extratos.
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
 ### 🌐 Frontend (Angular v20+)
-* **Angular SSR & Standalone Components** com arquitetura baseada em **Signals** reativos.
+* **Angular SSR & Standalone Components** com arquitetura reativa moderna baseada em **Signals**.
 * **Tailwind CSS** com paleta customizada Dark Neon e efeitos de *Glassmorphism*.
-* **Toasts Interativos** com barra de progresso e pausa no *hover*.
-* **Layout 100% Fixo**: Cabeçalho e barra lateral estáticos com rolagem independente de conteúdo.
-* **Gestão Familiar**: Alternância rápida de escopo (*Minhas Finanças* vs *Finanças da Família*).
+* **Integração Open Finance (Pluggy Connect Widget)** para sincronização bancária fluida.
+* **Toasts Interativos** com barra de progresso e controle temporal.
+* **Layout Fixo & Responsivo**: Cabeçalho e barra lateral estáticos com rolagem independente de conteúdo.
+* **Gestão Familiar**: Alternância dinâmica de escopo (*Minhas Finanças* vs *Finanças da Família*).
 
 ### ⚙️ Backend (NestJS + TypeScript)
-* **NestJS** modular (Auth, Users, Family, Accounts, Categories, Transactions, Cards, Vaults, Import, Mail).
+* **NestJS** modular (`Auth`, `Users`, `Family`, `Accounts`, `Categories`, `Transactions`, `Cards`, `Vaults`, `Investments`, `Loans`, `OpenFinance`, `Import`, `Mail`).
+* **Open Finance Engine (Pluggy API)**: Conexão regulada com mais de 50 instituições bancárias no Brasil.
 * **Prisma ORM** com banco de dados **MySQL 8.4**.
 * **Resend API & SMTP Mailer** com envio transacional de e-mails HTML responsivos.
 * **Segurança Reforçada**:
   * Autenticação via **JWT** e criptografia de senhas com **Bcrypt**.
-  * Medidor e validação de senhas fortes no cadastro e troca de senha.
-  * Bloqueio anti-brute force após 5 tentativas consecutivas com link de recuperação/desbloqueio.
+  * Medidor e validação de senhas fortes no cadastro e recuperação de senha.
+  * Bloqueio anti-brute force após 5 tentativas consecutivas com link seguro de desbloqueio.
   * Validação de e-mail com código de confirmação PIN de 6 dígitos.
 
 ### 🐳 Infraestrutura
@@ -58,15 +60,17 @@ docker compose up --build -d
 ---
 
 ## 🛡️ Funcionalidades Principais
-1. **Visão Geral Financeira (Dashboard)**: Métricas consolidadas, saldo livre para gastar e gráficos por categoria.
-2. **Extrato & Lançamentos**: Filtros avançados por ano, mês, tipo e busca textual, além de limpeza total da base em 1 clique.
-3. **Cartões de Crédito**: Gestão de faturas abertas/fechadas, projeção de parcelas futuras e controle de limites.
-4. **Cofres & Metas Blindadas**: Isolamento virtual de capital para aquisições de médio e longo prazo.
-5. **Motor de Importação Inteligente**: Upload de extratos `.OFX` e `.CSV` com categorização automática e proteção contra duplicidades.
-6. **Finanças da Família**: Criação de grupo familiar, convites por e-mail e consolidação de receitas e despesas compartilhadas.
+1. **Open Finance Brasil & Conexão Multi-Bancos**: Conexão direta com Itaú, Nubank, Banco do Brasil, Inter, Bradesco, Santander, BTG, XP, C6 e mais de 50 bancos com sincronização automática de saldos e transações.
+2. **Investimentos & Carteira Consolidada**: Rastreamento automático de renda fixa (CDB, LCI, LCA), fundos, ações e Tesouro Direto.
+3. **Passivos & Empréstimos**: Gestão de dívidas, financiamentos e contratos de crédito com atualização em tempo real do saldo devedor.
+4. **Visão Geral Financeira (Dashboard)**: Métricas consolidadas, saldo livre seguro e gráficos de distribuição.
+5. **Extrato & Lançamentos**: Filtros avançados por ano, mês, tipo e busca textual, além de limpeza total em 1 clique.
+6. **Cartões de Crédito**: Gestão de faturas abertas/fechadas, projeção de parcelas futuras e controle de limites.
+7. **Cofres & Metas Blindadas**: Isolamento virtual de capital para aquisições de médio e longo prazo sem autoengano.
+8. **Motor de Importação Híbrido**: Upload de extratos `.OFX` e `.CSV` com categorização automática e proteção contra duplicidades por hash FITID.
+9. **Finanças da Família**: Criação de grupo familiar, convites por e-mail e consolidação de despesas conjuntas com privacidade individual.
 
 ---
 
 ## 👨‍💻 Autor
 Desenvolvido por **Matheus Holowka**.
- 
