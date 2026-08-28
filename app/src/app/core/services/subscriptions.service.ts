@@ -67,12 +67,13 @@ export class SubscriptionsService {
     );
   }
 
-  scan(): Observable<SubscriptionItem[]> {
+  scan(): Observable<SubscriptionsResponse> {
     this._loading.set(true);
-    return this.http.post<SubscriptionItem[]>(`${this.apiUrl}/scan`, {}).pipe(
+    return this.http.post<SubscriptionsResponse>(`${this.apiUrl}/scan`, {}).pipe(
       tap({
-        next: () => {
-          this.findAll().subscribe();
+        next: (res) => {
+          this._data.set(res);
+          this._loading.set(false);
         },
         error: () => this._loading.set(false),
       })

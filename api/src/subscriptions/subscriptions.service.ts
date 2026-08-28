@@ -23,16 +23,10 @@ export class SubscriptionsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(userId: string) {
-    const subscriptions = await this.prisma.subscription.findMany({
+    let subscriptions = await this.prisma.subscription.findMany({
       where: { userId },
       orderBy: { amount: 'desc' },
     });
-
-    // If user has zero subscriptions registered, auto-scan transactions first
-    if (subscriptions.length === 0) {
-      await this.scanAndSyncFromTransactions(userId);
-      return this.findAll(userId);
-    }
 
     const activeSubs = subscriptions.filter((s) => s.status !== 'CANCELLED');
     const ghostSubs = subscriptions.filter((s) => s.status === 'FLAGGED_GHOST');
@@ -145,7 +139,7 @@ export class SubscriptionsService {
       }
     }
 
-    return this.prisma.subscription.findMany({ where: { userId } });
+    return this.findAll(userId);
   }
 
   async create(userId: string, data: CreateSubscriptionDto) {

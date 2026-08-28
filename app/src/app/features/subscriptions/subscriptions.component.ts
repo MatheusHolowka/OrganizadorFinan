@@ -153,8 +153,9 @@ import { ModalComponent } from '../../shared/components/modal/modal.component';
               </div>
             </div>
 
-            @if (subscriptionsService.loading()) {
+            @if (subscriptionsService.loading() && subscriptions().length === 0) {
               <div class="p-12 text-center text-xs font-mono text-neutral-500">
+                <div class="w-6 h-6 border-2 border-neutral-800 border-t-emerald-400 rounded-full animate-spin mx-auto mb-2"></div>
                 Carregando radar de assinaturas...
               </div>
             } @else if (subscriptions().length === 0) {
@@ -381,7 +382,8 @@ export class SubscriptionsComponent implements OnInit {
     this.subscriptionsService.scan().subscribe({
       next: (res) => {
         this.isScanning.set(false);
-        this.toast.success(`Varredura concluída! ${res.length} serviços identificados.`);
+        const count = res.subscriptions?.length || 0;
+        this.toast.success(`Varredura concluída! ${count} serviços identificados.`);
       },
       error: () => {
         this.isScanning.set(false);
